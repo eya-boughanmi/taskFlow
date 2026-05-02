@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des projets{% endblock %}
+
+{% block body %}
+<h1>Liste des projets</h1>
+<a href="{{ path('projet_new') }}" class="btn btn-primary mb-3">Ajouter</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Nom</th>
+        <th>Statut</th>
+        <th>Tâches</th>
+        <th>Créateur</th>
+        <th>Image</th>
+        <th>Actions</th>
+    </tr>
+    {% for p in projets %}
+    <tr>
+        <td>{{ p.nom }}</td>
+        <td>
+            {% if p.statut == 'planifie' %}<span class="badge bg-primary">🔵 Planifié</span>
+            {% elseif p.statut == 'en_cours' %}<span class="badge bg-warning text-dark">🟡 En cours</span>
+            {% elseif p.statut == 'termine' %}<span class="badge bg-success">🟢 Terminé</span>
+            {% elseif p.statut == 'annule' %}<span class="badge bg-danger">🔴 Annulé</span>
+            {% endif %}
+        </td>
+        <td>{{ p.taches|length }}</td>
+        <td>{{ p.createur ? p.createur.email : '-' }}</td>
+        <td>
+            {% if p.imageName %}
+                <img src="/uploads/{{ p.imageName }}" style="width:50px;height:50px;object-fit:cover;">
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ path('projet_show', {id: p.id}) }}" class="btn btn-sm btn-info">Voir</a>
+            <a href="{{ path('projet_edit', {id: p.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+            <form method="post" action="{{ path('projet_delete', {id: p.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.id) }}">
+                <button class="btn btn-sm btn-danger">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">Aucun projet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

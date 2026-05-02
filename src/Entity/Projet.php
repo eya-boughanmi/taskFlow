@@ -32,12 +32,7 @@ class Projet
     private ?\DateTime $dateLimite = null;
 
     #[ORM\Column(length: 20)]
-    #[Assert\Choice([
-    'planifie',
-    'en_cours',
-    'termine',
-    'annule'
-])]
+    #[Assert\Choice(choices: ['planifie', 'en_cours', 'termine', 'annule'])]
     private ?string $statut = null;
 
     #[ORM\Column(length: 255, nullable: true)]

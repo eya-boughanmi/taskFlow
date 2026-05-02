@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tâche{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>{{ tache is defined ? 'Modifier la tâche' : 'Nouvelle Tâche' }}</h1>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.titre) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.priorite) }}
+        {{ form_row(form.statut) }}
+        {{ form_row(form.dateEcheance) }}
+        {{ form_row(form.assigneA) }}
+        {{ form_row(form.etiquettes) }}
+        {{ form_row(form.pieceJointe) }}
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {% if tache is defined %}
+            <a href="{{ path('projet_show', {id: tache.projet.id}) }}" class="btn btn-secondary">Annuler</a>
+        {% elseif projet is defined %}
+            <a href="{{ path('projet_show', {id: projet.id}) }}" class="btn btn-secondary">Annuler</a>
+        {% endif %}
+    {{ form_end(form) }}
+</div>
+{% endblock %}

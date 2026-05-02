@@ -25,20 +25,13 @@ class Tache
     private ?string $description = null;
 
     #[ORM\Column(length: 10)]
-    #[Assert\Choice([
-    'basse',
-    'moyenne',
-    'haute',
-    'urgente'
-])]
+    #[Assert\Choice(choices: ['basse', 'moyenne', 'haute', 'urgente'])]
+
     private ?string $priorite = null;
 
     #[ORM\Column(length: 20)]
-    #[Assert\Choice([
-    'a_faire',
-    'en_cours',
-    'terminee'
-])]
+    #[Assert\Choice(choices: ['a_faire', 'en_cours', 'terminee'])]
+
     private ?string $statut = null;
 
     #[ORM\Column]

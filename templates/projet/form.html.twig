@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projet{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>{{ projet is defined and projet.id ? 'Modifier le projet' : 'Nouveau projet' }}</h1>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_row(form.nom) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.dateLimite) }}
+        {{ form_row(form.statut) }}
+        {{ form_row(form.image) }}
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a href="{{ path('projet_index') }}" class="btn btn-secondary">Annuler</a>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

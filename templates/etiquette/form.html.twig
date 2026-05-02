@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle étiquette{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Nouvelle étiquette</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.nom) }}
+        {{ form_row(form.couleur) }}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{{ path('etiquette_index') }}" class="btn btn-secondary">Annuler</a>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
