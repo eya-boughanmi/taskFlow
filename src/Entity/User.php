@@ -24,6 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
 #[Assert\Length(min: 3, max: 50)]
 #[ORM\Column(length: 50)]
+#[Groups(['projet:read'])]
 private ?string $pseudo = null;
     #[ORM\Column(length: 180)]
     private ?string $email = null;
@@ -50,6 +51,7 @@ private ?string $pseudo = null;
      * @var Collection<int, Tache>
      */
     #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'assigneA')]
+    #[Groups(['projet:read'])]
     private Collection $taches;
 
     public function __construct()

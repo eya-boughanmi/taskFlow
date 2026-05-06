@@ -7,6 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+#[ApiResource(
+    normalizationContext: ['groups' => ['tache:read']],
+    denormalizationContext: ['groups' => ['tache:write']],
+)]
 
 #[ORM\Entity(repositoryClass: TacheRepository::class)]
 class Tache
@@ -19,6 +23,7 @@ class Tache
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
 #[Assert\Length(min: 5, max: 255)]
+#[Groups(['tache:read', 'tache:write', 'projet:read'])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -31,7 +36,7 @@ class Tache
 
     #[ORM\Column(length: 20)]
     #[Assert\Choice(choices: ['a_faire', 'en_cours', 'terminee'])]
-
+#[Groups(['tache:read', 'tache:write', 'projet:read'])]
     private ?string $statut = null;
 
     #[ORM\Column]

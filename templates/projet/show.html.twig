@@ -4,19 +4,46 @@
 
 {% block body %}
 <div class="container mt-4">
+
     <h1>{{ projet.nom }}</h1>
     <p>{{ projet.description }}</p>
 
+    {# 🔹 Progress bar (من Twig) #}
     {% set total = projet.taches|length %}
     {% set done = projet.taches|filter(t => t.statut == 'terminee')|length %}
     {% set percent = total > 0 ? (done / total * 100)|round : 0 %}
 
     <div class="progress mb-3">
-        <div class="progress-bar bg-success" style="width: {{ percent }}%">{{ percent }}%</div>
+        <div class="progress-bar bg-success" style="width: {{ percent }}%">
+            {{ percent }}%
+        </div>
+    </div>
+
+    {# 🔥 🔥 STATS من Service هنا #}
+    <div class="mb-4">
+        <h5>Statistiques</h5>
+
+        <p><strong>Progression (service):</strong> {{ progress }}%</p>
+
+        <p><strong>Tâches:</strong></p>
+        <ul>
+            <li>À faire: {{ counts.a_faire }}</li>
+            <li>En cours: {{ counts.en_cours }}</li>
+            <li>Terminées: {{ counts.terminee }}</li>
+        </ul>
+
+        {% if overdue %}
+            <p class="text-danger fw-bold">Projet en retard !</p>
+        {% endif %}
+
+        <p><strong>Jours restants:</strong> {{ remaining }}</p>
     </div>
 
     <h3>Tâches</h3>
-    <a href="{{ path('tache_new', {id: projet.id}) }}" class="btn btn-primary mb-3">Ajouter tâche</a>
+
+    <a href="{{ path('tache_new', {id: projet.id}) }}" class="btn btn-primary mb-3">
+        Ajouter tâche
+    </a>
 
     <table class="table">
         <tr>
@@ -26,39 +53,68 @@
             <th>Étiquettes</th>
             <th>Actions</th>
         </tr>
+
         {% for t in projet.taches %}
         <tr>
             <td>{{ t.titre }}</td>
+
             <td>
-                {% if t.statut == 'a_faire' %}<span class="badge bg-secondary">À faire</span>
-                {% elseif t.statut == 'en_cours' %}<span class="badge bg-warning">En cours</span>
-                {% elseif t.statut == 'terminee' %}<span class="badge bg-success">Terminée</span>
+                {% if t.statut == 'a_faire' %}
+                    <span class="badge bg-secondary">À faire</span>
+                {% elseif t.statut == 'en_cours' %}
+                    <span class="badge bg-warning">En cours</span>
+                {% elseif t.statut == 'terminee' %}
+                    <span class="badge bg-success">Terminée</span>
                 {% endif %}
             </td>
+
             <td>
-                {% if t.priorite == 'basse' %}<span class="badge bg-primary">Basse</span>
-                {% elseif t.priorite == 'moyenne' %}<span class="badge bg-success">Moyenne</span>
-                {% elseif t.priorite == 'haute' %}<span class="badge bg-warning">Haute</span>
-                {% elseif t.priorite == 'urgente' %}<span class="badge bg-danger">Urgente</span>
+                {% if t.priorite == 'basse' %}
+                    <span class="badge bg-primary">Basse</span>
+                {% elseif t.priorite == 'moyenne' %}
+                    <span class="badge bg-success">Moyenne</span>
+                {% elseif t.priorite == 'haute' %}
+                    <span class="badge bg-warning">Haute</span>
+                {% elseif t.priorite == 'urgente' %}
+                    <span class="badge bg-danger">Urgente</span>
                 {% endif %}
             </td>
+
             <td>
                 {% for e in t.etiquettes %}
-                    <span class="badge" style="background-color: {{ e.couleur }}">{{ e.nom }}</span>
+                    <span class="badge" style="background-color: {{ e.couleur }}">
+                        {{ e.nom }}
+                    </span>
                 {% endfor %}
             </td>
+
             <td>
-{% if app.user == projet.createur or is_granted('ROLE_ADMIN') %}
-    <a href="{{ path('projet_edit', {'id': projet.id }) }}">Modifier</a>
-{% endif %}                <form method="post" action="{{ path('tache_delete', {id: t.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer ?')">
+                {% if app.user == projet.createur or is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('projet_edit', {'id': projet.id }) }}" class="btn btn-sm btn-warning">
+                        Modifier
+                    </a>
+                {% endif %}
+
+                <form method="post"
+                      action="{{ path('tache_delete', {id: t.id}) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Supprimer ?')">
+
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
-                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        Supprimer
+                    </button>
                 </form>
             </td>
         </tr>
+
         {% else %}
-        <tr><td colspan="5">Aucune tâche.</td></tr>
+        <tr>
+            <td colspan="5">Aucune tâche.</td>
+        </tr>
         {% endfor %}
     </table>
+
 </div>
 {% endblock %}

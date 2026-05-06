@@ -8,6 +8,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\ApiResource;
+
+#[ApiResource(
+    normalizationContext: ['groups' => ['projet:read']],
+    denormalizationContext: ['groups' => ['projet:write']],
+)]
 #[ORM\Entity(repositoryClass: ProjetRepository::class)]
 class Projet
 {
@@ -19,20 +26,25 @@ class Projet
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
 #[Assert\Length(min: 3, max: 100)]
+#[Groups(['projet:read', 'projet:write'])]
     private ?string $nom = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['projet:read'])]
     private ?\DateTimeImmutable $dateCreation = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotNull]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?\DateTime $dateLimite = null;
 
     #[ORM\Column(length: 20)]
     #[Assert\Choice(choices: ['planifie', 'en_cours', 'termine', 'annule'])]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?string $statut = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -40,6 +52,7 @@ class Projet
 
     #[ORM\ManyToOne(inversedBy: 'projets')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['projet:read'])]
     private ?User $createur = null;
 
     /**

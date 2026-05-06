@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\ProjetStatsCalculator;
 
 class ProjetController extends AbstractController
 {
@@ -49,13 +50,16 @@ class ProjetController extends AbstractController
     }
 
     #[Route('/projets/{id}', name: 'projet_show')]
-    public function show(Projet $projet): Response
-    {
-        return $this->render('projet/show.html.twig', [
-            'projet' => $projet
-        ]);
-    }
-
+    public function show(Projet $projet, ProjetStatsCalculator $stats): Response
+{
+    return $this->render('projet/show.html.twig', [
+        'projet' => $projet,
+        'progress' => $stats->getProgressPercentage($projet),
+        'counts' => $stats->getTaskCountByStatus($projet),
+        'overdue' => $stats->isOverdue($projet),
+        'remaining' => $stats->getRemainingDays($projet),
+    ]);
+}
     #[Route('/projets/{id}/modifier', name: 'projet_edit')]
     public function edit(Request $request, Projet $projet, EntityManagerInterface $em): Response
     {
@@ -98,4 +102,5 @@ class ProjetController extends AbstractController
 
         return $this->redirectToRoute('projet_index');
     }
+
 }
