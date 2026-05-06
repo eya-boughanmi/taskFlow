@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class TacheController extends AbstractController
 {
+    #[IsGranted('ROLE_USER')]
     #[Route('/projets/{id}/taches/nouvelle', name: 'tache_new')]
     public function new(Request $request, Projet $projet, EntityManagerInterface $em): Response
     {

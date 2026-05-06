@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ProjetController extends AbstractController
 {
@@ -22,6 +23,7 @@ class ProjetController extends AbstractController
     }
 
     #[Route('/projets/nouveau', name: 'projet_new')]
+    #[IsGranted('ROLE_CHEF_PROJET')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $projet = new Projet();
@@ -32,7 +34,7 @@ class ProjetController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $projet->setDateCreation(new \DateTimeImmutable());
             $userRepo = $em->getRepository(\App\Entity\User::class);
-            $projet->setCreateur($userRepo->find(1));   
+            $projet->setCreateur($this->getUser());  
             $em->persist($projet);
             $em->flush();
 
@@ -68,6 +70,12 @@ class ProjetController extends AbstractController
 
             return $this->redirectToRoute('projet_index');
         }
+        if (
+    $projet->getCreateur() !== $this->getUser()
+    && !$this->isGranted('ROLE_ADMIN')
+) {
+    throw $this->createAccessDeniedException();
+}
 
         return $this->render('projet/form.html.twig', [
             'form' => $form->createView()
@@ -81,6 +89,12 @@ class ProjetController extends AbstractController
             $em->remove($projet);
             $em->flush();
         }
+        if (
+    $projet->getCreateur() !== $this->getUser()
+    && !$this->isGranted('ROLE_ADMIN')
+) {
+    throw $this->createAccessDeniedException();
+}
 
         return $this->redirectToRoute('projet_index');
     }

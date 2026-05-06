@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class EtiquetteController extends AbstractController
 {
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/etiquettes', name: 'etiquette_index')]
     public function index(EtiquetteRepository $repo): Response
     {

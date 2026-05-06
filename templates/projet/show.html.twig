@@ -48,8 +48,9 @@
                 {% endfor %}
             </td>
             <td>
-                <a href="{{ path('tache_edit', {id: t.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
-                <form method="post" action="{{ path('tache_delete', {id: t.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer ?')">
+{% if app.user == projet.createur or is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('projet_edit', {'id': projet.id }) }}">Modifier</a>
+{% endif %}                <form method="post" action="{{ path('tache_delete', {id: t.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer ?')">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
                     <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
                 </form>

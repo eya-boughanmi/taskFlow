@@ -12,9 +12,38 @@
             <div class="container">
                 <a class="navbar-brand" href="{{ path('projet_index') }}">TaskFlow</a>
                 <div class="navbar-nav">
-                    <a class="nav-link text-white" href="{{ path('projet_index') }}">Projets</a>
-                    <a class="nav-link text-white" href="{{ path('etiquette_index') }}">Étiquettes</a>
-                </div>
+
+    <a class="nav-link text-white" href="{{ path('projet_index') }}">Projets</a>
+    <a class="nav-link text-white" href="{{ path('etiquette_index') }}">Étiquettes</a>
+
+</div>
+
+{# 🔹 RIGHT SIDE (USER AREA) #}
+<div class="navbar-nav ms-auto">
+
+    {% if app.user %}
+
+        <span class="navbar-text text-white me-3">
+            👤 {{ app.user.pseudo }}
+        </span>
+
+        <a class="nav-link text-white" href="{{ path('app_logout') }}">
+            Logout
+        </a>
+
+    {% else %}
+
+        <a class="nav-link text-white" href="{{ path('app_login') }}">
+            Login
+        </a>
+
+        <a class="nav-link text-white" href="{{ path('app_register') }}">
+            Register
+        </a>
+
+    {% endif %}
+
+</div>
             </div>
         </nav>
 
