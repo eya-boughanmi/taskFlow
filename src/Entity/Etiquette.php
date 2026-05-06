@@ -19,7 +19,7 @@ class Etiquette
     #[Assert\NotBlank]#[Assert\NotBlank]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 7)]
+    #[ORM\Column(length: 7)] 
     #[Assert\NotBlank]
 #[Assert\Regex('/^#[A-Fa-f0-9]{6}$/')]
     private ?string $couleur = null;
