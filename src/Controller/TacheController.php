@@ -10,12 +10,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 final class TacheController extends AbstractController
 {
     #[IsGranted('ROLE_USER')]
     #[Route('/projets/{id}/taches/nouvelle', name: 'tache_new')]
-    public function new(Request $request, Projet $projet, EntityManagerInterface $em): Response
+    public function new(
+    Request $request,
+    Projet $projet,
+    EntityManagerInterface $em,
+    MailerInterface $mailer
+): Response
     {
         $tache = new Tache();
         $tache->setProjet($projet);
@@ -27,6 +34,20 @@ final class TacheController extends AbstractController
             $tache->setDateCreation(new \DateTimeImmutable());
             $em->persist($tache);
             $em->flush();
+            if ($tache->getAssigneA()) {
+
+    $email = (new TemplatedEmail())
+        ->from('noreply@taskflow.com')
+        ->to($tache->getAssigneA()->getEmail())
+        ->subject('✅ Nouvelle tâche assignée : ' . $tache->getTitre())
+        ->htmlTemplate('emails/tache_assignee.html.twig')
+        ->context([
+            'tache' => $tache,
+            'assignateur' => $this->getUser(),
+        ]);
+
+    $mailer->send($email);
+}
             $this->addFlash('success', 'Tâche ajoutée avec succès');
             return $this->redirectToRoute('projet_show', ['id' => $projet->getId()]);
         }
@@ -70,4 +91,17 @@ final class TacheController extends AbstractController
 
         return $this->redirectToRoute('projet_show', ['id' => $projetId]);
     }
+    #[Route('/test-mail', name: 'app_tache_test')]
+public function test(MailerInterface $mailer): Response
+{
+    $email = (new TemplatedEmail())
+        ->from('noreply@taskflow.com')
+        ->to('test@test.com')
+        ->subject('Test Mail')
+        ->html('<p>Hello from Symfony</p>');
+
+    $mailer->send($email);
+
+    dd('sent');
+}
 }

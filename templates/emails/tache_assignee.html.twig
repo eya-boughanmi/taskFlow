@@ -1,0 +1,11 @@
+<h2>Nouvelle tâche assignée</h2>
+
+<p><strong>Titre :</strong> {{ tache.titre }}</p>
+
+<p><strong>Projet :</strong> {{ tache.projet.nom }}</p>
+
+<p><strong>Priorité :</strong> {{ tache.priorite }}</p>
+
+<p><strong>Date échéance :</strong> {{ tache.dateEcheance ? tache.dateEcheance|date('Y-m-d') : 'Non définie' }}</p>
+
+<p><strong>Assignée par :</strong> {{ assignateur.pseudo }}</p>
