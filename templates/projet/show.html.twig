@@ -44,8 +44,23 @@
     <a href="{{ path('tache_new', {id: projet.id}) }}" class="btn btn-primary mb-3">
         Ajouter tâche
     </a>
+    <hr>
 
+<h4>📋 Derniers projets consultés</h4>
+
+<ul class="list-group">
+
+    {% for rp in recentProjects %}
+        <li class="list-group-item">
+            <a href="{{ path('projet_show', {'id': rp.id}) }}">
+                {{ rp.nom }}
+            </a>
+        </li>
+    {% endfor %}
+
+</ul>
     <table class="table">
+    
         <tr>
             <th>Titre</th>
             <th>Statut</th>
@@ -102,9 +117,9 @@
 
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
 
-                    <button type="submit" class="btn btn-sm btn-danger">
-                        Supprimer
-                    </button>
+                    <button type="submit" class="btn btn-danger btn-sm delete-btn">
+    Supprimer
+</button>
                 </form>
             </td>
         </tr>

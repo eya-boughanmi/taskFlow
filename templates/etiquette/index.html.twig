@@ -22,7 +22,7 @@
             <td>
                 <form method="post" action="{{ path('etiquette_delete', {id: e.id}) }}" onsubmit="return confirm('Supprimer ?')">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ e.id) }}">
-                    <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    <button class="btn btn-danger btn-sm delete-btn">Supprimer</button>
                 </form>
             </td>
         </tr>

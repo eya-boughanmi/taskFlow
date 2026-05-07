@@ -5,7 +5,8 @@ namespace App\Repository;
 use App\Entity\Projet;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use App\Entity\User;
+use App\Entity\Etiquette;
 /**
  * @extends ServiceEntityRepository<Projet>
  */
@@ -40,4 +41,39 @@ class ProjetRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findByFilters(
+    ?string $nom,
+    ?string $statut,
+    ?User $createur,
+    ?Etiquette $etiquette
+): array {
+
+    $qb = $this->createQueryBuilder('p');
+
+    if ($nom) {
+        $qb->andWhere('LOWER(p.nom) LIKE LOWER(:nom)')
+           ->setParameter('nom', '%' . $nom . '%');
+    }
+
+    if ($statut) {
+        $qb->andWhere('p.statut = :statut')
+           ->setParameter('statut', $statut);
+    }
+
+    if ($createur) {
+        $qb->andWhere('p.createur = :createur')
+           ->setParameter('createur', $createur);
+    }
+
+    if ($etiquette) {
+        $qb->innerJoin('p.taches', 't')
+           ->innerJoin('t.etiquettes', 'e')
+           ->andWhere('e = :etiquette')
+           ->setParameter('etiquette', $etiquette);
+    }
+
+    return $qb->orderBy('p.dateCreation', 'DESC')
+              ->getQuery()
+              ->getResult();
+}
 }

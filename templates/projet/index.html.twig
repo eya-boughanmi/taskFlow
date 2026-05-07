@@ -9,7 +9,33 @@
 {% if is_granted('ROLE_CHEF_PROJET') %}
     <a href="{{ path('projet_new') }}" class="btn btn-primary mb-3">Ajouter</a>
 {% endif %}
+{{ form_start(searchForm) }}
 
+<div class="row">
+
+    <div class="col">
+        {{ form_row(searchForm.nom) }}
+    </div>
+
+    <div class="col">
+        {{ form_row(searchForm.statut) }}
+    </div>
+
+    <div class="col">
+        {{ form_row(searchForm.createur) }}
+    </div>
+
+    <div class="col">
+        {{ form_row(searchForm.etiquette) }}
+    </div>
+
+</div>
+
+<button class="btn btn-primary mt-3">
+    Rechercher
+</button>
+
+{{ form_end(searchForm) }}
 <table class="table table-bordered">
     <tr>
         <th>Nom</th>
