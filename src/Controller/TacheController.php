@@ -95,7 +95,7 @@ final class TacheController extends AbstractController
 public function test(MailerInterface $mailer): Response
 {
     $email = (new TemplatedEmail())
-        ->from('noreply@taskflow.com')
+        ->from('test@test.com')
         ->to('test@test.com')
         ->subject('Test Mail')
         ->html('<p>Hello from Symfony</p>');
