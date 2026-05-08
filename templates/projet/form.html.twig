@@ -1,10 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Projet{% endblock %}
+{% block title %}{{ projet is not null and projet.id ? 'Modifier le projet' : 'Nouveau projet' }}{% endblock %}
 
 {% block body %}
 <div class="container mt-4">
-    <h1>{{ projet is defined and projet.id ? 'Modifier le projet' : 'Nouveau projet' }}</h1>
+    <h1>{{ projet is not null and projet.id ? 'Modifier le projet' : 'Nouveau projet' }}</h1>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Afficher l'image actuelle lors de la modification #}
+    {% if projet is not null and projet.imageName %}
+        <div class="mb-3">
+            <p><strong>Image actuelle :</strong></p>
+            <img src="{{ asset('uploads/projets/' ~ projet.imageName) }}"
+                 style="max-height:200px;object-fit:cover;" class="img-thumbnail">
+            <p class="text-muted small">Sélectionnez une nouvelle image pour la remplacer.</p>
+        </div>
+    {% endif %}
 
     {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
         {{ form_row(form.nom) }}
@@ -12,7 +28,7 @@
         {{ form_row(form.dateLimite) }}
         {{ form_row(form.statut) }}
         {{ form_row(form.image) }}
-        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <button type="submit" class="btn btn-success">💾 Enregistrer</button>
         <a href="{{ path('projet_index') }}" class="btn btn-secondary">Annuler</a>
     {{ form_end(form) }}
 </div>

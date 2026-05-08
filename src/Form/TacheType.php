@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class TacheType extends AbstractType
 {
@@ -18,7 +19,9 @@ class TacheType extends AbstractType
     {
         $builder
             ->add('titre')
+
             ->add('description')
+
             ->add('priorite', ChoiceType::class, [
                 'choices' => [
                     'Basse'   => 'basse',
@@ -27,6 +30,7 @@ class TacheType extends AbstractType
                     'Urgente' => 'urgente',
                 ]
             ])
+
             ->add('statut', ChoiceType::class, [
                 'choices' => [
                     'À faire'  => 'a_faire',
@@ -34,26 +38,39 @@ class TacheType extends AbstractType
                     'Terminée' => 'terminee',
                 ]
             ])
+
             ->add('dateEcheance')
+
             ->add('assigneA', EntityType::class, [
-                'class'        => User::class,
+                'class' => User::class,
                 'choice_label' => 'email',
-                'required'     => false,
-                'placeholder'  => '-- Non assignée --',
-            ])
-            ->add('etiquettes', EntityType::class, [
-                'class'        => Etiquette::class,
-                'choice_label' => 'nom',
-                'multiple'     => true,
-                'expanded'     => true,
-                'by_reference' => false,
-                'required'     => false,
-            ])
-            ->add('pieceJointe', FileType::class, [
-                'mapped'   => false,
                 'required' => false,
+                'placeholder' => '-- Non assignée --',
+            ])
+
+            ->add('etiquettes', EntityType::class, [
+                'class' => Etiquette::class,
+                'choice_label' => 'nom',
+                'multiple' => true,
+                'expanded' => true,
+                'by_reference' => false,
+                'required' => false,
+            ])
+
+            ->add('pieceJointe', FileType::class, [
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File(
+    maxSize: '5M',
+    mimeTypes: [
+        'application/pdf',
+        'image/jpeg',
+        'image/png'
+    ]
+)
+                ]
             ]);
-            
     }
 
     public function configureOptions(OptionsResolver $resolver): void

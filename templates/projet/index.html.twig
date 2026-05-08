@@ -3,40 +3,37 @@
 {% block title %}Liste des projets{% endblock %}
 
 {% block body %}
+<div class="container mt-4">
 
 <h1>Liste des projets</h1>
 
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
 {% if is_granted('ROLE_CHEF_PROJET') %}
-    <a href="{{ path('projet_new') }}" class="btn btn-primary mb-3">Ajouter</a>
+    <a href="{{ path('projet_new') }}" class="btn btn-primary mb-3">➕ Ajouter un projet</a>
 {% endif %}
-{{ form_start(searchForm) }}
 
-<div class="row">
-
-    <div class="col">
-        {{ form_row(searchForm.nom) }}
-    </div>
-
-    <div class="col">
-        {{ form_row(searchForm.statut) }}
-    </div>
-
-    <div class="col">
-        {{ form_row(searchForm.createur) }}
-    </div>
-
-    <div class="col">
-        {{ form_row(searchForm.etiquette) }}
-    </div>
-
+{# Formulaire de recherche (méthode GET) #}
+{{ form_start(searchForm, {'attr': {'class': 'mb-4'}}) }}
+<div class="row g-2">
+    <div class="col-md-3">{{ form_row(searchForm.nom) }}</div>
+    <div class="col-md-3">{{ form_row(searchForm.statut) }}</div>
+    <div class="col-md-3">{{ form_row(searchForm.createur) }}</div>
+    <div class="col-md-3">{{ form_row(searchForm.etiquette) }}</div>
 </div>
-
-<button class="btn btn-primary mt-3">
-    Rechercher
-</button>
-
+<button type="submit" class="btn btn-primary mt-2">🔍 Rechercher</button>
+<a href="{{ path('projet_index') }}" class="btn btn-secondary mt-2">Réinitialiser</a>
 {{ form_end(searchForm) }}
-<table class="table table-bordered">
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
     <tr>
         <th>Nom</th>
         <th>Statut</th>
@@ -45,7 +42,8 @@
         <th>Image</th>
         <th>Actions</th>
     </tr>
-
+    </thead>
+    <tbody>
     {% for p in projets %}
         <tr>
             <td>{{ p.nom }}</td>
@@ -64,39 +62,68 @@
 
             <td>{{ p.taches|length }}</td>
 
-            <td>{{ p.createur ? p.createur.email : '-' }}</td>
+            <td>{{ p.createur ? p.createur.pseudo : '-' }}</td>
 
             <td>
                 {% if p.imageName %}
-                    <img src="/uploads/{{ p.imageName }}" style="width:50px;height:50px;object-fit:cover;">
+                    <img src="{{ asset('uploads/projets/' ~ p.imageName) }}"
+                         style="width:50px;height:50px;object-fit:cover;" class="rounded">
                 {% else %}
                     -
                 {% endif %}
             </td>
 
             <td>
-                <a href="{{ path('projet_show', {id: p.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                <a href="{{ path('projet_show', {id: p.id}) }}" class="btn btn-sm btn-info">👁 Voir</a>
 
                 {% if app.user == p.createur or is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('projet_edit', {id: p.id}) }}" class="btn btn-sm btn-warning">✏️ Modifier</a>
 
-                    <a href="{{ path('projet_edit', {id: p.id}) }}" class="btn btn-sm btn-warning">
-                        Modifier
-                    </a>
-
-                    <form method="post" action="{{ path('projet_delete', {'id': p.id}) }}" style="display:inline-block;">
+                    <form method="post"
+                          action="{{ path('projet_delete', {id: p.id}) }}"
+                          style="display:inline-block;"
+                          class="delete-projet-form">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.id) }}">
-                        <button class="btn btn-sm btn-danger">Supprimer</button>
+                        <button type="submit" class="btn btn-sm btn-danger">🗑 Supprimer</button>
                     </form>
-
                 {% endif %}
             </td>
         </tr>
     {% else %}
         <tr>
-            <td colspan="6" class="text-center">Aucun projet.</td>
+            <td colspan="6" class="text-center">Aucun projet trouvé.</td>
         </tr>
     {% endfor %}
-
+    </tbody>
 </table>
 
+</div>
+
+<script>
+document.querySelectorAll('.delete-projet-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Confirmer la suppression',
+                text: 'Cette action est irréversible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Supprimer',
+                cancelButtonText: 'Annuler'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        } else {
+            if (confirm('Supprimer ce projet ?')) {
+                form.submit();
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

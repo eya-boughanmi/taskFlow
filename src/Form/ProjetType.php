@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Symfony\Component\Validator\Constraints\File;
 class ProjetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -26,8 +26,18 @@ class ProjetType extends AbstractType
                 ]
             ])
             ->add('image', FileType::class, [
-                'mapped'   => false,
-                'required' => false,
+    'mapped' => false,
+    'required' => false,
+    'constraints' => [
+        new File(
+            maxSize: '2M',
+            mimeTypes: [
+                'image/jpeg',
+                'image/png',
+                'image/webp'
+            ]
+        )
+    ]
             ]);
     }
 
