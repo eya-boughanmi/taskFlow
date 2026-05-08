@@ -43,7 +43,7 @@ final class TacheController extends AbstractController
         ->htmlTemplate('emails/tache_assignee.html.twig')
         ->context([
             'tache' => $tache,
-            'assignateur' => $this->getUser(),
+            'assignateur' => $this->getUser()?->getPseudo() ?? 'Système',
         ]);
 
     $mailer->send($email);
