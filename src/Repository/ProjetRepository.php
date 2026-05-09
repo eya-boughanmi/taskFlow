@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
 use App\Entity\Etiquette;
+
 /**
  * @extends ServiceEntityRepository<Projet>
  */
@@ -17,63 +18,78 @@ class ProjetRepository extends ServiceEntityRepository
         parent::__construct($registry, Projet::class);
     }
 
-    //    /**
-    //     * @return Projet[] Returns an array of Projet objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Projet
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    // ── Méthode qui retourne un tableau (pour usage sans pagination) ──
     public function findByFilters(
-    ?string $nom,
-    ?string $statut,
-    ?User $createur,
-    ?Etiquette $etiquette
-): array {
+        ?string $nom,
+        ?string $statut,
+        ?User $createur,
+        ?Etiquette $etiquette
+    ): array {
+        $qb = $this->createQueryBuilder('p');
 
-    $qb = $this->createQueryBuilder('p');
+        if ($nom) {
+            $qb->andWhere('LOWER(p.nom) LIKE LOWER(:nom)')
+               ->setParameter('nom', '%' . $nom . '%');
+        }
+        if ($statut) {
+            $qb->andWhere('p.statut = :statut')
+               ->setParameter('statut', $statut);
+        }
+        if ($createur) {
+            $qb->andWhere('p.createur = :createur')
+               ->setParameter('createur', $createur);
+        }
+        if ($etiquette) {
+            $qb->innerJoin('p.taches', 't')
+               ->innerJoin('t.etiquettes', 'e')
+               ->andWhere('e = :etiquette')
+               ->setParameter('etiquette', $etiquette);
+        }
 
-    if ($nom) {
-        $qb->andWhere('LOWER(p.nom) LIKE LOWER(:nom)')
-           ->setParameter('nom', '%' . $nom . '%');
+        return $qb->orderBy('p.dateCreation', 'DESC')
+                  ->getQuery()
+                  ->getResult();
     }
 
-    if ($statut) {
-        $qb->andWhere('p.statut = :statut')
-           ->setParameter('statut', $statut);
+    // ── Méthode qui retourne une Query (pour KnpPaginator) ──
+    public function findByFiltersQuery(
+        ?string $nom,
+        ?string $statut,
+        ?User $createur,
+        ?Etiquette $etiquette
+    ): \Doctrine\ORM\Query {
+        $qb = $this->createQueryBuilder('p');
+
+        if ($nom) {
+            $qb->andWhere('LOWER(p.nom) LIKE LOWER(:nom)')
+               ->setParameter('nom', '%' . $nom . '%');
+        }
+        if ($statut) {
+            $qb->andWhere('p.statut = :statut')
+               ->setParameter('statut', $statut);
+        }
+        if ($createur) {
+            $qb->andWhere('p.createur = :createur')
+               ->setParameter('createur', $createur);
+        }
+        if ($etiquette) {
+            $qb->innerJoin('p.taches', 't')
+               ->innerJoin('t.etiquettes', 'e')
+               ->andWhere('e = :etiquette')
+               ->setParameter('etiquette', $etiquette);
+        }
+
+        return $qb->orderBy('p.dateCreation', 'DESC')
+                  ->getQuery();
     }
 
-    if ($createur) {
-        $qb->andWhere('p.createur = :createur')
-           ->setParameter('createur', $createur);
+    // ── Méthode pour les 5 projets les plus récents (session sidebar) ──
+    public function findMostRecentProjects(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.dateCreation', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
-
-    if ($etiquette) {
-        $qb->innerJoin('p.taches', 't')
-           ->innerJoin('t.etiquettes', 'e')
-           ->andWhere('e = :etiquette')
-           ->setParameter('etiquette', $etiquette);
-    }
-
-    return $qb->orderBy('p.dateCreation', 'DESC')
-              ->getQuery()
-              ->getResult();
-}
 }

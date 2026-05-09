@@ -33,16 +33,17 @@
 {{ form_end(searchForm) }}
 
 <table class="table table-bordered table-hover">
-    <thead class="table-dark">
+<thead class="table-dark">
     <tr>
-        <th>Nom</th>
-        <th>Statut</th>
+        <th>{{ knp_pagination_sortable(projets, 'Nom', 'p.nom') }}</th>
+        <th>{{ knp_pagination_sortable(projets, 'Statut', 'p.statut') }}</th>
         <th>Tâches</th>
         <th>Créateur</th>
         <th>Image</th>
         <th>Actions</th>
+        
     </tr>
-    </thead>
+</thead>
     <tbody>
     {% for p in projets %}
         <tr>
@@ -96,6 +97,14 @@
     {% endfor %}
     </tbody>
 </table>
+{# PAGINATION #}
+<div class="d-flex justify-content-center mt-4">
+    {{ knp_pagination_render(projets) }}
+</div>
+
+<p class="text-center mt-2">
+    Total : {{ projets.getTotalItemCount }}
+</p>
 
 </div>
 

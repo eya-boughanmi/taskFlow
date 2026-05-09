@@ -83,7 +83,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for t in projet.taches %}
+        {% for t in taches %}
         <tr>
             <td>{{ t.titre }}</td>
 
@@ -148,6 +148,10 @@
 
 </tbody>
 </table>
+{# PAGINATION TACHES #}
+<div class="d-flex justify-content-center mt-3">
+    {{ knp_pagination_render(taches) }}
+</div>
 
 </div>
 

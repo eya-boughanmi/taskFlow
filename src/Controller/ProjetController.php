@@ -14,6 +14,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\RequestStack;
 use App\Form\ProjetSearchType;
 use App\Service\FileUploader;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Repository\TacheRepository;
+
 
 class ProjetController extends AbstractController
 {
@@ -22,39 +25,72 @@ class ProjetController extends AbstractController
     private FileUploader $projetsUploader
 ) {}
 
-    #[Route('/projets', name: 'projet_index')]
-    public function index(
-        Request $request,
-        ProjetRepository $repo
-    ): Response {
+#[Route('/projets', name: 'projet_index')]
+public function index(
+    Request $request,
+    PaginatorInterface $paginator,
+    ProjetRepository $repo
+): Response {
+    $form = $this->createForm(ProjetSearchType::class, null, [
+        'method' => 'GET',
+        'csrf_protection' => false,
+    ]);
+    $form->handleRequest($request);
 
-        $form = $this->createForm(ProjetSearchType::class, null, [
-            'method' => 'GET',
-            'csrf_protection' => false,
-        ]);
-
-        $form->handleRequest($request);
-
-        $nom       = null;
-        $statut    = null;
-        $createur  = null;
-        $etiquette = null;
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data      = $form->getData();
-            $nom       = $data['nom'] ?? null;
-            $statut    = $data['statut'] ?? null;
-            $createur  = $data['createur'] ?? null;
-            $etiquette = $data['etiquette'] ?? null;
-        }
-
-        $projets = $repo->findByFilters($nom, $statut, $createur, $etiquette);
-
-        return $this->render('projet/index.html.twig', [
-            'projets'    => $projets,
-            'searchForm' => $form->createView(),
-        ]);
+    $nom = $statut = $createur = $etiquette = null;
+    if ($form->isSubmitted() && $form->isValid()) {
+        $data = $form->getData();
+        $nom = $data['nom'] ?? null;
+        $statut = $data['statut'] ?? null;
+        $createur = $data['createur'] ?? null;
+        $etiquette = $data['etiquette'] ?? null;
     }
+
+    // Construction du QueryBuilder
+    $qb = $repo->createQueryBuilder('p');
+
+    if ($nom) {
+        $qb->andWhere('LOWER(p.nom) LIKE LOWER(:nom)')
+           ->setParameter('nom', '%' . $nom . '%');
+    }
+    if ($statut) {
+        $qb->andWhere('p.statut = :statut')
+           ->setParameter('statut', $statut);
+    }
+    if ($createur) {
+        $qb->andWhere('p.createur = :createur')
+           ->setParameter('createur', $createur);
+    }
+    if ($etiquette) {
+        $qb->innerJoin('p.taches', 't')
+           ->innerJoin('t.etiquettes', 'e')
+           ->andWhere('e = :etiquette')
+           ->setParameter('etiquette', $etiquette);
+    }
+
+    // ⚠️ Lecture obligatoire des paramètres de tri (depuis l'URL)
+    $sortField = $request->query->get('sort', 'p.dateCreation');
+    $sortDir   = $request->query->get('direction', 'DESC');
+    $qb->orderBy($sortField, $sortDir);
+
+    $query = $qb->getQuery();
+
+    // Pagination
+    $projets = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1),
+        6,
+        [
+            'sortFieldParameterName' => 'sort',
+            'sortDirectionParameterName' => 'direction',
+        ]
+    );
+
+    return $this->render('projet/index.html.twig', [
+        'projets' => $projets,
+        'searchForm' => $form->createView(),
+    ]);
+}
 
     #[Route('/projets/nouveau', name: 'projet_new')]
     #[IsGranted('ROLE_CHEF_PROJET')]
@@ -92,47 +128,59 @@ class ProjetController extends AbstractController
         ]);
     }
 
-    #[Route('/projets/{id}', name: 'projet_show')]
-    public function show(
-        Projet $projet,
-        RequestStack $requestStack,
-        ProjetRepository $repo
-    ): Response {
-        $session = $requestStack->getSession();
-        $recent  = $session->get('recent_projects', []);
-        $recent  = array_diff($recent, [$projet->getId()]);
-        array_unshift($recent, $projet->getId());
-        $recent  = array_slice($recent, 0, 5);
-        $session->set('recent_projects', $recent);
+#[Route('/projets/{id}', name: 'projet_show')]
+public function show(
+    Projet $projet,
+    RequestStack $requestStack,
+    ProjetRepository $repo,
+    PaginatorInterface $paginator,
+    Request $request,
+    TacheRepository $tacheRepo  // ← Ajout
+): Response {
+    // Session projets récents (inchangé)
+    $session = $requestStack->getSession();
+    $recent  = $session->get('recent_projects', []);
+    $recent  = array_diff($recent, [$projet->getId()]);
+    array_unshift($recent, $projet->getId());
+    $recent  = array_slice($recent, 0, 5);
+    $session->set('recent_projects', $recent);
+    $recentProjects = $repo->findBy(['id' => $recent]);
 
-        $recentProjects = $repo->findBy(['id' => $recent]);
+    // ✅ Pagination des tâches (CORRIGÉE)
+    $tachesQuery = $tacheRepo->createQueryBuilder('t')
+        ->where('t.projet = :projet')
+        ->setParameter('projet', $projet)
+        ->getQuery();
 
-        $total  = count($projet->getTaches());
-        $done   = 0;
-        $counts = ['a_faire' => 0, 'en_cours' => 0, 'terminee' => 0];
+    $taches = $paginator->paginate(
+        $tachesQuery,
+        $request->query->getInt('page', 1),
+        10
+    );
 
-        foreach ($projet->getTaches() as $tache) {
-            $counts[$tache->getStatut()]++;
-            if ($tache->getStatut() === 'terminee') {
-                $done++;
-            }
-        }
-
-        $progress  = $total > 0 ? round(($done / $total) * 100) : 0;
-        $today     = new \DateTime();
-        $overdue   = $projet->getDateLimite() < $today;
-        $remaining = $today->diff($projet->getDateLimite())->days;
-
-        return $this->render('projet/show.html.twig', [
-            'projet'         => $projet,
-            'recentProjects' => $recentProjects,
-            'progress'       => $progress,
-            'counts'         => $counts,
-            'overdue'        => $overdue,
-            'remaining'      => $remaining,
-        ]);
+    // Statistiques (inchangé)
+    $total  = count($projet->getTaches());
+    $done   = 0;
+    $counts = ['a_faire' => 0, 'en_cours' => 0, 'terminee' => 0];
+    foreach ($projet->getTaches() as $tache) {
+        $counts[$tache->getStatut()]++;
+        if ($tache->getStatut() === 'terminee') $done++;
     }
+    $progress  = $total > 0 ? round(($done / $total) * 100) : 0;
+    $today     = new \DateTime();
+    $overdue   = $projet->getDateLimite() < $today;
+    $remaining = $today->diff($projet->getDateLimite())->days;
 
+    return $this->render('projet/show.html.twig', [
+        'projet'         => $projet,
+        'recentProjects' => $recentProjects,
+        'progress'       => $progress,
+        'counts'         => $counts,
+        'overdue'        => $overdue,
+        'remaining'      => $remaining,
+        'taches'         => $taches,
+    ]);
+}
     #[Route('/projets/{id}/modifier', name: 'projet_edit')]
     public function edit(
         Request $request,
@@ -202,4 +250,5 @@ class ProjetController extends AbstractController
 
         return $this->redirectToRoute('projet_index');
     }
+    
 }
