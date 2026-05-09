@@ -41,6 +41,8 @@
         <th>Créateur</th>
         <th>Image</th>
         <th>Actions</th>
+        <th>Date création</th>
+
         
     </tr>
 </thead>
@@ -89,6 +91,9 @@
                     </form>
                 {% endif %}
             </td>
+            <td>
+    {{ p.dateCreation|time_ago }}
+</td>
         </tr>
     {% else %}
         <tr>

@@ -27,7 +27,8 @@
     {# Statistiques du service #}
     <div class="mb-4">
         <h5>Statistiques</h5>
-        <p><strong>Progression :</strong> {{ progress }}%</p>
+        <p><strong>Progression :</strong></p>
+{{ progress_bar(progress) }}
         <p><strong>Tâches :</strong></p>
         <ul>
             <li>À faire : {{ counts.a_faire }}</li>
@@ -80,6 +81,7 @@
             <th>Étiquettes</th>
             <th>Fichier</th>
             <th>Actions</th>
+            <th>Date création</th>
         </tr>
         </thead>
         <tbody>
@@ -98,16 +100,8 @@
             </td>
 
             <td>
-                {% if t.priorite == 'basse' %}
-                    <span class="badge bg-primary">🔵 Basse</span>
-                {% elseif t.priorite == 'moyenne' %}
-                    <span class="badge bg-success">🟢 Moyenne</span>
-                {% elseif t.priorite == 'haute' %}
-                    <span class="badge bg-warning text-dark">🟠 Haute</span>
-                {% elseif t.priorite == 'urgente' %}
-                    <span class="badge bg-danger">🔴 Urgente</span>
-                {% endif %}
-            </td>
+    {{ t.priorite|priority_icon }}
+</td>
 
             <td>
                 {% for e in t.etiquettes %}
@@ -137,6 +131,9 @@
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
         <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
     </form>
+</td>
+<td>
+    {{ t.dateCreation|time_ago }}
 </td>
 </tr>
 
