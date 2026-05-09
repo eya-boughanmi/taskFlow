@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\ApiResource;
 
+
 #[ApiResource(
     normalizationContext: ['groups' => ['projet:read']],
     denormalizationContext: ['groups' => ['projet:write']],
@@ -21,6 +22,7 @@ class Projet
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['projet:read', 'projet:write'])]  
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
@@ -52,9 +54,8 @@ class Projet
 
     #[ORM\ManyToOne(inversedBy: 'projets')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['projet:read'])]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?User $createur = null;
-
     /**
      * @var Collection<int, Tache>
      */
