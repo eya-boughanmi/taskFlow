@@ -3,6 +3,14 @@ import './stimulus_bootstrap.js';
 
 import './styles/app.css';
 
+/**
+ * Turbo Drive est désactivé : la navigation suit le comportement natif du navigateur
+ * (chargement complet du document pour chaque URL). Sans cela, Turbo 8 pouvait mettre
+ * à jour l’URL / l’historique tout en laissant le corps de page inchangé visuellement
+ * (interaction fragile avec data-turbo-permanent et le shell Dasher).
+ */
+Turbo.session.drive = false;
+
 if (Turbo?.config?.drive) {
     Turbo.config.drive.progressBarDelay = 35;
 }

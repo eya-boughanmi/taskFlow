@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr" data-turbo-prefetch="true">
+<html lang="fr" data-turbo-prefetch="false">
 <head>
     {% include 'partials/_head_dashboard.html.twig' %}
     <title>{% block title %}TaskFlow{% endblock %}</title>
     {% block stylesheets %}{% endblock %}
+    {{ importmap('app') }}
 </head>
 <body class="tf-page-gradient tf-turbo-app">
-{{ importmap('app') }}
 <div>
-    <div id="tf-persist-sidebar" data-turbo-permanent>
+    <div id="tf-persist-sidebar">
         {% include 'partials/_sidebar.html.twig' %}
     </div>
 

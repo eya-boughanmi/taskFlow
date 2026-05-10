@@ -8,23 +8,28 @@
         {# Colonne gauche : illustration + message (visible aussi sur mobile, version compacte) #}
         <div class="col-lg-6 tf-login-hero-col position-relative overflow-hidden">
             <div class="tf-login-hero-bg position-absolute top-0 start-0 w-100 h-100"></div>
-            <div class="position-relative z-1 d-flex flex-column justify-content-between p-4 p-lg-6 p-xl-8 text-white h-100 tf-login-hero-inner">
-                <div>
-                    <a href="{{ path('app_dashboard') }}" class="d-inline-flex align-items-center gap-2 text-white text-decoration-none mb-3 mb-lg-5 tf-login-fade" data-turbo="false">
+            <div class="position-relative z-1 d-flex flex-column p-4 p-lg-6 p-xl-8 text-white h-100 tf-login-hero-inner tf-login-hero-inner--centered">
+                <div class="tf-login-hero-head flex-shrink-0">
+                    <a href="{{ path('app_dashboard') }}" class="d-inline-flex align-items-center gap-2 text-white text-decoration-none mb-3 mb-lg-4 tf-login-fade" data-turbo="false">
                         <img src="{{ asset('dasher/assets/images/brand/logo/logo-icon.svg') }}" alt="" width="44" height="44" class="rounded-3 shadow"/>
                         <span class="fw-bold fs-3">TaskFlow</span>
                     </a>
                     <h2 class="h1 fw-bold mb-2 mb-lg-3 tf-login-fade tf-login-fade-delay-1">Pilotez vos projets.</h2>
-                    <p class="text-white-50 mb-0 mb-lg-4 tf-login-fade tf-login-fade-delay-2 tf-login-lead">
+                    <p class="text-white-50 mb-0 tf-login-fade tf-login-fade-delay-2 tf-login-lead">
                         Tableaux de bord, priorités et livrables — une interface pensée comme une application SaaS.
                     </p>
                 </div>
 
-                <div class="tf-login-illus-wrap tf-login-fade tf-login-fade-delay-3 my-3 my-lg-0">
-                    {% include 'partials/_illustration_saas_tasks.svg.twig' %}
+                {# Illustration existante : zone hero centrée (milieu de la colonne / viewport visuel) #}
+                <div class="tf-login-hero-illus flex-grow-1 d-flex align-items-center justify-content-center w-100 py-4 py-lg-5">
+                    <div class="tf-login-illus-wrap tf-login-illus-wrap--hero tf-login-fade tf-login-fade-delay-3 w-100">
+                        <div class="tf-login-illus-scene mx-auto">
+                            {% include 'partials/_illustration_saas_tasks.svg.twig' %}
+                        </div>
+                    </div>
                 </div>
 
-                <p class="small text-white-50 mb-0 tf-login-fade tf-login-fade-delay-4 d-none d-lg-block">© {{ 'now'|date('Y') }} TaskFlow</p>
+                <p class="small text-white-50 mb-0 tf-login-fade tf-login-fade-delay-4 flex-shrink-0 d-none d-lg-block">© {{ 'now'|date('Y') }} TaskFlow</p>
             </div>
         </div>
 

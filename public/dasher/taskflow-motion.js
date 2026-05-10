@@ -21,5 +21,19 @@
     nodes.forEach((el) => io.observe(el));
   };
 
-  document.addEventListener('DOMContentLoaded', reveal);
+  let revealFrame = null;
+  const scheduleReveal = () => {
+    if (revealFrame !== null) {
+      cancelAnimationFrame(revealFrame);
+    }
+    revealFrame = requestAnimationFrame(() => {
+      revealFrame = null;
+      reveal();
+    });
+  };
+
+  // DOMContentLoaded : premier chargement complet (scripts defer).
+  // turbo:load : chaque navigation Turbo (le contenu du body est remplacé sans reload ; DOMContentLoaded ne refire pas).
+  document.addEventListener('DOMContentLoaded', scheduleReveal);
+  document.addEventListener('turbo:load', scheduleReveal);
 })();
