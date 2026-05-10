@@ -20,8 +20,18 @@ security:
             logout:
                 path: app_logout
                 target: app_login
+            # Redirect unauthenticated users to the login form
+            entry_point: App\Security\LoginFormAuthenticator
+            # Remember me support (optional, tied to the checkbox in the form)
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week in seconds
+                path: /
 
     access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_ADMIN }
 
     role_hierarchy:

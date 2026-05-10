@@ -21,11 +21,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
     #[Assert\NotBlank]
-#[Assert\Length(min: 3, max: 50)]
-#[ORM\Column(length: 50)]
-#[Groups(['projet:read'])]
-private ?string $pseudo = null;
+    #[Assert\Length(min: 3, max: 50)]
+    #[ORM\Column(length: 50)]
+    #[Groups(['projet:read'])]
+    private ?string $pseudo = null;
+
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -125,14 +127,11 @@ private ?string $pseudo = null;
     }
 
     /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     * @see UserInterface
      */
-    public function __serialize(): array
+    public function eraseCredentials(): void
     {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-
-        return $data;
+        // If you store any temporary, sensitive data on the user, clear it here
     }
 
     public function getPseudo(): ?string

@@ -46,37 +46,78 @@
                     <h1 class="h2 fw-bold mb-2">Connexion</h1>
                     <p class="text-secondary mb-0">
                         Pas encore de compte ?
-                        <a href="{{ path('app_register') }}" class="fw-semibold text-decoration-none" data-turbo="false">S’inscrire</a>
+                        <a href="{{ path('app_register') }}" class="fw-semibold text-decoration-none" data-turbo="false">S'inscrire</a>
                     </p>
                 </div>
 
                 <div class="card border-0 shadow-lg tf-glass tf-login-card tf-login-rise">
                     <div class="card-body p-4 p-md-5">
+
+                        {# ── Bloc d'erreur d'authentification (mauvais identifiants, compte inexistant…) #}
                         {% if error %}
-                            <div class="alert alert-danger border-0 shadow-sm mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            <div class="alert alert-danger border-0 shadow-sm mb-4 d-flex align-items-start gap-2" role="alert">
+                                <i class="ti ti-alert-circle fs-5 mt-1 flex-shrink-0"></i>
+                                <div>
+                                    {% set msg = error.messageKey %}
+                                    {% if msg == 'Invalid credentials.' %}
+                                        <strong>Identifiants incorrects.</strong><br>
+                                        Vérifiez votre adresse e-mail et votre mot de passe, puis réessayez.
+                                    {% elseif msg == 'Username could not be found.' or 'user.not_found' in msg %}
+                                        <strong>Aucun compte trouvé.</strong><br>
+                                        Cette adresse e-mail n'est associée à aucun compte. <a href="{{ path('app_register') }}" class="alert-link">Créer un compte</a>.
+                                    {% elseif 'Too many failed login attempts' in msg %}
+                                        <strong>Trop de tentatives.</strong><br>
+                                        Votre accès est temporairement bloqué. Veuillez patienter avant de réessayer.
+                                    {% else %}
+                                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                                    {% endif %}
+                                </div>
+                            </div>
                         {% endif %}
 
                         {% if app.user %}
                             <div class="alert alert-info border-0 mb-4">
-                                Connecté en tant que {{ app.user.userIdentifier }} —
+                                Connecté en tant que <strong>{{ app.user.userIdentifier }}</strong> —
                                 <a href="{{ logout_path() }}" class="fw-semibold" data-turbo="false">Se déconnecter</a>
                             </div>
                         {% endif %}
 
-                        <form method="post" class="needs-validation" novalidate data-turbo="false">
+                        {#
+                            IMPORTANT : l'action du formulaire DOIT pointer sur /login
+                            pour que le firewall Symfony intercepte la requête POST.
+                            Sans cet attribut action, Symfony ne peut pas authentifier l'utilisateur.
+                        #}
+                        <form method="post" action="{{ path('app_login') }}" class="needs-validation" novalidate data-turbo="false">
                             <div class="mb-3">
                                 <label for="inputEmail" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control form-control-lg" autocomplete="email" required autofocus>
-                                <div class="invalid-feedback">Adresse email invalide.</div>
+                                <input type="email"
+                                       value="{{ last_username }}"
+                                       name="email"
+                                       id="inputEmail"
+                                       class="form-control form-control-lg{% if error %} is-invalid{% endif %}"
+                                       autocomplete="email"
+                                       required
+                                       autofocus>
+                                <div class="invalid-feedback">Adresse e-mail invalide.</div>
                             </div>
+
                             <div class="mb-3">
-                                <label for="inputPassword" class="form-label">Mot de passe</label>
+                                <label for="inputPassword" class="form-label">Mot de passe <span class="text-danger">*</span></label>
                                 <div class="password-field position-relative">
-                                    <input type="password" name="password" id="inputPassword" class="form-control form-control-lg fakePassword" autocomplete="current-password" required>
-                                    <span class="position-absolute top-50 end-0 translate-middle-y pe-3" style="cursor:pointer;"><i class="ti ti-eye-off passwordToggler"></i></span>
+                                    <input type="password"
+                                           name="password"
+                                           id="inputPassword"
+                                           class="form-control form-control-lg fakePassword{% if error %} is-invalid{% endif %}"
+                                           autocomplete="current-password"
+                                           required>
+                                    <span class="position-absolute top-50 end-0 translate-middle-y pe-3" style="cursor:pointer;">
+                                        <i class="ti ti-eye-off passwordToggler"></i>
+                                    </span>
                                     <div class="invalid-feedback">Mot de passe requis.</div>
                                 </div>
                             </div>
+
+                            {# Token CSRF obligatoire — Symfony le vérifie dans le CsrfTokenBadge de l'authenticator #}
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                             <div class="mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
