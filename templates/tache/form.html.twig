@@ -1,28 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tâche{% endblock %}
+{% block title %}Tâche · TaskFlow{% endblock %}
+
+{% block page_header %}
+    <div class="mb-6 tf-reveal">
+        <p class="text-secondary small text-uppercase fw-semibold mb-1">Tâche</p>
+        <h1 class="h2 mb-0">{{ tache is defined ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h1>
+    </div>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>{{ tache is defined ? 'Modifier la tâche' : 'Nouvelle Tâche' }}</h1>
+    <div class="row justify-content-center">
+        <div class="col-xl-8">
+            <div class="card card-lg border-0 shadow-sm tf-glass tf-reveal">
+                <div class="card-body p-lg-6">
+                    {% if tache is defined and tache.pieceJointeName %}
+                        <div class="mb-4 p-4 rounded-3 bg-body-secondary bg-opacity-50 border border-dashed">
+                            <p class="small text-secondary mb-2">Pièce jointe actuelle</p>
+                            {% set u = asset('uploads/taches/' ~ tache.pieceJointeName) %}
+                            {% set ext = tache.pieceJointeName|lower|split('.')|last %}
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                {% if ext in ['jpg','jpeg','png','gif','webp','svg'] %}
+                                    <a href="{{ u }}" data-tf-image-preview class="rounded-3 overflow-hidden border d-inline-block">
+                                        <img src="{{ u }}" alt="" style="max-height:120px;object-fit:cover;">
+                                    </a>
+                                {% endif %}
+                                <div class="btn-group btn-group-sm">
+                                    {% if ext in ['jpg','jpeg','png','gif','webp','svg'] %}
+                                        <a href="{{ u }}" data-tf-image-preview class="btn btn-dark"><i class="ti ti-scan"></i></a>
+                                    {% endif %}
+                                    <a href="{{ u }}" class="btn btn-white border" target="_blank" rel="noopener"><i class="ti ti-external-link"></i></a>
+                                    <a href="{{ u }}" class="btn btn-outline-secondary" download target="_blank" rel="noopener" data-turbo="false"><i class="ti ti-download"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
 
-    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-        {{ form_errors(form) }}
-        {{ form_row(form.titre) }}
-        {{ form_row(form.description) }}
-        {{ form_row(form.priorite) }}
-        {{ form_row(form.statut) }}
-        {{ form_row(form.dateEcheance) }}
-        {{ form_row(form.assigneA) }}
-        {{ form_row(form.etiquettes) }}
-        {{ form_row(form.pieceJointe) }}
-
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% if tache is defined %}
-            <a href="{{ path('projet_show', {id: tache.projet.id}) }}" class="btn btn-secondary">Annuler</a>
-        {% elseif projet is defined %}
-            <a href="{{ path('projet_show', {id: projet.id}) }}" class="btn btn-secondary">Annuler</a>
-        {% endif %}
-    {{ form_end(form) }}
-</div>
+                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        {{ form_errors(form) }}
+                        {{ form_row(form.titre) }}
+                        {{ form_row(form.description) }}
+                        {{ form_row(form.priorite) }}
+                        {{ form_row(form.statut) }}
+                        {{ form_row(form.dateEcheance) }}
+                        {{ form_row(form.assigneA) }}
+                        {{ form_row(form.etiquettes) }}
+                        <div class="mb-3">
+                            {{ form_label(form.pieceJointe) }}
+                            {{ form_widget(form.pieceJointe, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_help(form.pieceJointe) }}
+                            {{ form_errors(form.pieceJointe) }}
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <button type="submit" class="btn btn-gradient-primary btn-lg shadow-sm">
+                                <i class="ti ti-device-floppy me-1"></i> Enregistrer
+                            </button>
+                            {% if tache is defined %}
+                                <a href="{{ path('projet_show', {id: tache.projet.id}) }}" class="btn btn-white btn-lg border">Annuler</a>
+                            {% elseif projet is defined %}
+                                <a href="{{ path('projet_show', {id: projet.id}) }}" class="btn btn-white btn-lg border">Annuler</a>
+                            {% endif %}
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -64,10 +64,14 @@ class TaskFlowExtension extends AbstractExtension
         }
 
         return '
-        <div class="progress">
-            <div class="progress-bar '.$class.'" style="width: '.$percent.'%">
-                '.$percent.'%
+        <div class="progress rounded-pill" style="height: 10px;">
+            <div class="progress-bar '.$class.'" style="width: '.$percent.'%; transition: width .6s ease;">
+                <span class="visually-hidden">'.$percent.'%</span>
             </div>
+        </div>
+        <div class="d-flex justify-content-between small text-secondary mt-2">
+            <span>Avancement</span>
+            <span class="fw-semibold text-body">'.$percent.'%</span>
         </div>
         ';
     }

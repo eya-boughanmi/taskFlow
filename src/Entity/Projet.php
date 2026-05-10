@@ -53,7 +53,7 @@ class Projet
     private ?string $imageName = null;
 
     #[ORM\ManyToOne(inversedBy: 'projets')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['projet:read', 'projet:write'])]
     private ?User $createur = null;
     /**

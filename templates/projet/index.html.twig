@@ -1,143 +1,120 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des projets{% endblock %}
+{% block title %}Liste des projets · TaskFlow{% endblock %}
+
+{% block page_header %}
+    <div class="row align-items-center mb-6 tf-reveal">
+        <div class="col-lg-8 mb-3 mb-lg-0">
+            <p class="text-secondary small text-uppercase fw-semibold mb-1">Vue d’ensemble</p>
+            <h1 class="h2 mb-0">Projets</h1>
+            <p class="text-secondary mb-0">Suivez l’avancement, les deadlines et les livrables en un coup d’œil.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            {% if is_granted('ROLE_CHEF_PROJET') %}
+                <a href="{{ path('projet_new') }}" class="btn btn-gradient-primary btn-lg shadow-sm">
+                    <i class="ti ti-plus me-1"></i> Nouveau projet
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-
-<h1>Liste des projets</h1>
-
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="card card-lg border-0 shadow-sm tf-reveal mb-4 tf-glass">
+        <div class="card-header bg-transparent border-0 pb-0">
+            <h5 class="mb-1">Filtres</h5>
+            <p class="text-secondary small mb-0">Affinez la liste par nom, statut, créateur ou étiquette.</p>
         </div>
-    {% endfor %}
-{% endfor %}
+        <div class="card-body">
+            {{ form_start(searchForm, {'attr': {'class': 'needs-validation'}}) }}
+            <div class="row g-3">
+                <div class="col-md-3">{{ form_row(searchForm.nom, {'attr': {'class': 'form-control'}}) }}</div>
+                <div class="col-md-3">{{ form_row(searchForm.statut) }}</div>
+                <div class="col-md-3">{{ form_row(searchForm.createur) }}</div>
+                <div class="col-md-3">{{ form_row(searchForm.etiquette) }}</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+                <button type="submit" class="btn btn-dark"><i class="ti ti-search me-1"></i> Rechercher</button>
+                <a href="{{ path('projet_index') }}" class="btn btn-white border">Réinitialiser</a>
+            </div>
+            {{ form_end(searchForm) }}
+        </div>
+    </div>
 
-{% if is_granted('ROLE_CHEF_PROJET') %}
-    <a href="{{ path('projet_new') }}" class="btn btn-primary mb-3">➕ Ajouter un projet</a>
-{% endif %}
-
-{# Formulaire de recherche (méthode GET) #}
-{{ form_start(searchForm, {'attr': {'class': 'mb-4'}}) }}
-<div class="row g-2">
-    <div class="col-md-3">{{ form_row(searchForm.nom) }}</div>
-    <div class="col-md-3">{{ form_row(searchForm.statut) }}</div>
-    <div class="col-md-3">{{ form_row(searchForm.createur) }}</div>
-    <div class="col-md-3">{{ form_row(searchForm.etiquette) }}</div>
-</div>
-<button type="submit" class="btn btn-primary mt-2">🔍 Rechercher</button>
-<a href="{{ path('projet_index') }}" class="btn btn-secondary mt-2">Réinitialiser</a>
-{{ form_end(searchForm) }}
-
-<table class="table table-bordered table-hover">
-<thead class="table-dark">
-    <tr>
-        <th>{{ knp_pagination_sortable(projets, 'Nom', 'p.nom') }}</th>
-        <th>{{ knp_pagination_sortable(projets, 'Statut', 'p.statut') }}</th>
-        <th>Tâches</th>
-        <th>Créateur</th>
-        <th>Image</th>
-        <th>Actions</th>
-        <th>Date création</th>
-
-        
-    </tr>
-</thead>
-    <tbody>
-    {% for p in projets %}
-        <tr>
-            <td>{{ p.nom }}</td>
-
-            <td>
-                {% if p.statut == 'planifie' %}
-                    <span class="badge bg-primary">🔵 Planifié</span>
-                {% elseif p.statut == 'en_cours' %}
-                    <span class="badge bg-warning text-dark">🟡 En cours</span>
-                {% elseif p.statut == 'termine' %}
-                    <span class="badge bg-success">🟢 Terminé</span>
-                {% elseif p.statut == 'annule' %}
-                    <span class="badge bg-danger">🔴 Annulé</span>
-                {% endif %}
-            </td>
-
-            <td>{{ p.taches|length }}</td>
-
-            <td>{{ p.createur ? p.createur.pseudo : '-' }}</td>
-
-            <td>
-                {% if p.imageName %}
-                    <img src="{{ asset('uploads/projets/' ~ p.imageName) }}"
-                         style="width:50px;height:50px;object-fit:cover;" class="rounded">
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-
-            <td>
-                <a href="{{ path('projet_show', {id: p.id}) }}" class="btn btn-sm btn-info">👁 Voir</a>
-
-                {% if app.user == p.createur or is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('projet_edit', {id: p.id}) }}" class="btn btn-sm btn-warning">✏️ Modifier</a>
-
-                    <form method="post"
-                          action="{{ path('projet_delete', {id: p.id}) }}"
-                          style="display:inline-block;"
-                          class="delete-projet-form">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.id) }}">
-                        <button type="submit" class="btn btn-sm btn-danger">🗑 Supprimer</button>
-                    </form>
-                {% endif %}
-            </td>
-            <td>
-    {{ p.dateCreation|time_ago }}
-</td>
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="6" class="text-center">Aucun projet trouvé.</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-{# PAGINATION #}
-<div class="d-flex justify-content-center mt-4">
-    {{ knp_pagination_render(projets) }}
-</div>
-
-<p class="text-center mt-2">
-    Total : {{ projets.getTotalItemCount }}
-</p>
-
-</div>
-
-<script>
-document.querySelectorAll('.delete-projet-form').forEach(function(form) {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'Confirmer la suppression',
-                text: 'Cette action est irréversible.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Supprimer',
-                cancelButtonText: 'Annuler'
-            }).then(function(result) {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        } else {
-            if (confirm('Supprimer ce projet ?')) {
-                form.submit();
-            }
-        }
-    });
-});
-</script>
+    <div class="card card-lg border-0 shadow-sm tf-reveal tf-glass overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 tf-table">
+                    <thead class="bg-body-secondary bg-opacity-50">
+                        <tr>
+                            <th>{{ knp_pagination_sortable(projets, 'Nom', 'p.nom') }}</th>
+                            <th>{{ knp_pagination_sortable(projets, 'Statut', 'p.statut') }}</th>
+                            <th>Tâches</th>
+                            <th>Créateur</th>
+                            <th>Média</th>
+                            <th class="text-end">Actions</th>
+                            <th>{{ knp_pagination_sortable(projets, 'Créé', 'p.dateCreation') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in projets %}
+                        <tr class="tf-card-hover">
+                            <td class="fw-semibold">{{ p.nom }}</td>
+                            <td>
+                                {% if p.statut == 'planifie' %}
+                                    <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Planifié</span>
+                                {% elseif p.statut == 'en_cours' %}
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">En cours</span>
+                                {% elseif p.statut == 'termine' %}
+                                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Terminé</span>
+                                {% elseif p.statut == 'annule' %}
+                                    <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis">Annulé</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-body-secondary text-body">{{ p.taches|length }}</span></td>
+                            <td>{{ p.createur ? p.createur.pseudo : '—' }}</td>
+                            <td>
+                                {% if p.imageName %}
+                                    {% set ext = p.imageName|lower|split('.')|last %}
+                                    {% if ext in ['jpg','jpeg','png','gif','webp','svg'] %}
+                                        <a href="{{ asset('uploads/projets/' ~ p.imageName) }}" data-tf-image-preview class="d-inline-block rounded-3 overflow-hidden border">
+                                            <img src="{{ asset('uploads/projets/' ~ p.imageName) }}" alt="" class="tf-thumb">
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ asset('uploads/projets/' ~ p.imageName) }}" class="btn btn-sm btn-white border" target="_blank" rel="noopener" download data-turbo="false">
+                                            <i class="ti ti-file-download"></i>
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-secondary">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group flex-wrap justify-content-end">
+                                    <a href="{{ path('projet_show', {id: p.id}) }}" class="btn btn-sm btn-white border"><i class="ti ti-eye"></i></a>
+                                    {% if app.user == p.createur or is_granted('ROLE_ADMIN') %}
+                                        <a href="{{ path('projet_edit', {id: p.id}) }}" class="btn btn-sm btn-white border"><i class="ti ti-edit"></i></a>
+                                        <form method="post" action="{{ path('projet_delete', {id: p.id}) }}" class="d-inline delete-projet-form">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="ti ti-trash"></i></button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="text-secondary small">{{ p.dateCreation|time_ago }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-6 text-secondary">Aucun projet trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent border-top border-dashed d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <span class="text-secondary small">Total : <strong>{{ projets.getTotalItemCount }}</strong></span>
+            <div class="tf-pagination">{{ knp_pagination_render(projets) }}</div>
+        </div>
+    </div>
 {% endblock %}

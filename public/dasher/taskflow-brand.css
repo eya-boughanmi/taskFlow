@@ -1,0 +1,281 @@
+/**
+ * TaskFlow — premium palette (violet / teal accents, not default blue)
+ * Works with Dasher theme.css + Bootstrap 5 data-bs-theme.
+ */
+:root {
+  --tf-accent: #8b5cf6;
+  --tf-accent-2: #14b8a6;
+  --tf-radius: 1rem;
+  --tf-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  --bs-primary: #7c3aed;
+  --bs-primary-rgb: 124, 58, 237;
+  --bs-link-color: #7c3aed;
+  --bs-link-hover-color: #5b21b6;
+}
+
+[data-bs-theme="dark"] {
+  --bs-primary: #a78bfa;
+  --bs-primary-rgb: 167, 139, 250;
+  --bs-link-color: #c4b5fd;
+  --bs-link-hover-color: #e9d5ff;
+  --tf-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+.tf-page-gradient {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(124, 58, 237, 0.15), transparent 55%),
+    radial-gradient(900px 500px at 110% 20%, rgba(20, 184, 166, 0.12), transparent 50%),
+    var(--bs-body-bg);
+}
+
+.tf-glass {
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bs-body-bg) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--bs-border-color) 80%, transparent);
+  box-shadow: var(--tf-shadow);
+}
+
+.tf-card-hover {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tf-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.12);
+}
+
+[data-bs-theme="dark"] .tf-card-hover:hover {
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
+}
+
+.tf-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.tf-reveal.tf-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tf-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: linear-gradient(135deg, var(--tf-accent), var(--tf-accent-2));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--tf-accent) 25%, transparent);
+}
+
+.table.tf-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--bs-secondary-color);
+  border-bottom-width: 1px;
+}
+
+.tf-thumb {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: var(--tf-radius);
+  cursor: zoom-in;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tf-thumb:hover {
+  transform: scale(1.04);
+  box-shadow: 0 12px 30px rgba(124, 58, 237, 0.25);
+}
+
+.btn-gradient-primary {
+  background: linear-gradient(135deg, #7c3aed 0%, #14b8a6 100%);
+  border: none;
+  color: #fff;
+}
+
+.btn-gradient-primary:hover {
+  filter: brightness(1.05);
+  color: #fff;
+}
+
+#miniSidebar .nav-link.active {
+  color: var(--bs-primary) !important;
+}
+
+.tf-pagination .pagination .page-link {
+  border-radius: 0.5rem;
+  margin: 0 2px;
+  border: 1px solid var(--bs-border-color);
+}
+
+.tf-pagination .pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #7c3aed 0%, #14b8a6 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.navbar-glass {
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+/* Hotwire Turbo — barre de progression premium */
+.turbo-progress-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #7c3aed, #14b8a6, #7c3aed);
+  background-size: 200% 100%;
+  animation: tf-turbo-shimmer 1.2s linear infinite;
+}
+
+@keyframes tf-turbo-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Page login SaaS */
+.tf-login-page {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.tf-login-shell {
+  flex: 1;
+}
+
+.tf-login-hero-col {
+  min-height: 220px;
+}
+
+@media (min-width: 992px) {
+  .tf-login-hero-col {
+    min-height: 100vh;
+  }
+}
+
+.tf-login-hero-inner {
+  min-height: 220px;
+}
+
+@media (min-width: 992px) {
+  .tf-login-hero-inner {
+    min-height: 100vh;
+  }
+}
+
+.tf-login-lead {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 992px) {
+  .tf-login-lead {
+    font-size: 1.05rem;
+  }
+}
+
+.tf-login-illus-wrap {
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 992px) {
+  .tf-login-illus-wrap {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+.tf-illus-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.25));
+}
+
+.tf-login-form-max {
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 992px) {
+  .tf-login-form-max {
+    margin-left: 0;
+  }
+}
+
+.tf-login-hero-bg {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(67, 56, 202, 0.88) 45%, rgba(13, 148, 136, 0.75) 100%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.tf-login-fade {
+  animation: tf-login-fade-in 0.7s ease forwards;
+  opacity: 0;
+}
+
+.tf-login-fade-delay-1 {
+  animation-delay: 0.12s;
+}
+.tf-login-fade-delay-2 {
+  animation-delay: 0.24s;
+}
+.tf-login-fade-delay-3 {
+  animation-delay: 0.36s;
+}
+.tf-login-fade-delay-4 {
+  animation-delay: 0.48s;
+}
+
+@keyframes tf-login-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tf-login-rise {
+  animation: tf-login-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes tf-login-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tf-login-card {
+  border-radius: 1.25rem;
+}
+
+/* Zone principale (contenu remplacé par Turbo) */
+#tf-main-scroll {
+  min-height: 2rem;
+}
+
+/* Barre de progression @hotwired/turbo (navigation sans rechargement complet) */
+.turbo-progress-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #7c3aed, #14b8a6);
+  box-shadow: 0 0 18px rgba(124, 58, 237, 0.4);
+}

@@ -1,0 +1,25 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7c3aed">
+<link rel="icon" href="{{ asset('dasher/assets/images/favicon/favicon.ico') }}" sizes="any">
+<link rel="icon" type="image/png" href="{{ asset('dasher/assets/images/favicon/favicon-32x32.png') }}" sizes="32x32">
+
+<script src="{{ asset('dasher/assets/js/vendors/color-modes.js') }}"></script>
+<script>
+  if (localStorage.getItem('sidebarExpanded') === 'false') {
+    document.documentElement.classList.add('collapsed');
+    document.documentElement.classList.remove('expanded');
+  } else {
+    document.documentElement.classList.remove('collapsed');
+    document.documentElement.classList.add('expanded');
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+
+<link rel="stylesheet" href="{{ asset('dasher/assets/css/theme.css') }}"/>
+<link rel="stylesheet" href="{{ asset('dasher/taskflow-brand.css') }}"/>

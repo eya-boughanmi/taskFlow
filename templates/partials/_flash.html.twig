@@ -1,0 +1,9 @@
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        {% set alertType = type == 'error' ? 'danger' : type %}
+        <div class="alert alert-{{ alertType }} alert-dismissible fade show tf-reveal tf-reveal-visible shadow-sm border-0" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endfor %}
+{% endfor %}

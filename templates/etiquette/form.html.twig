@@ -1,16 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle étiquette{% endblock %}
+{% block title %}Nouvelle étiquette · TaskFlow{% endblock %}
+
+{% block page_header %}
+    <div class="mb-6 tf-reveal">
+        <p class="text-secondary small text-uppercase fw-semibold mb-1">Référentiel</p>
+        <h1 class="h2 mb-0">Nouvelle étiquette</h1>
+    </div>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Nouvelle étiquette</h1>
-
-    {{ form_start(form) }}
-        {{ form_row(form.nom) }}
-        {{ form_row(form.couleur) }}
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-        <a href="{{ path('etiquette_index') }}" class="btn btn-secondary">Annuler</a>
-    {{ form_end(form) }}
-</div>
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-lg border-0 shadow-sm tf-glass tf-reveal">
+                <div class="card-body p-lg-6">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        {{ form_row(form.nom) }}
+                        {{ form_row(form.couleur) }}
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <button type="submit" class="btn btn-gradient-primary btn-lg shadow-sm"><i class="ti ti-device-floppy me-1"></i> Enregistrer</button>
+                            <a href="{{ path('etiquette_index') }}" class="btn btn-white btn-lg border">Annuler</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

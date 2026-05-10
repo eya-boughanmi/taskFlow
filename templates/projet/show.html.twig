@@ -1,155 +1,198 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ projet.nom }}{% endblock %}
+{% block title %}{{ projet.nom }} · TaskFlow{% endblock %}
+
+{% block page_header %}
+    <div class="row g-4 align-items-start mb-6 tf-reveal">
+        <div class="col-lg-8">
+            <p class="text-secondary small text-uppercase fw-semibold mb-1">Projet</p>
+            <h1 class="h2 mb-2">{{ projet.nom }}</h1>
+            <p class="text-secondary mb-0">{{ projet.description|default('Aucune description.')|nl2br }}</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            {% if app.user == projet.createur or is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('projet_edit', {id: projet.id}) }}" class="btn btn-white border shadow-sm">
+                    <i class="ti ti-edit me-1"></i> Modifier
+                </a>
+            {% endif %}
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('tache_new', {id: projet.id}) }}" class="btn btn-gradient-primary shadow-sm">
+                    <i class="ti ti-checkbox me-1"></i> Nouvelle tâche
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-
-    <h1>{{ projet.nom }}</h1>
-
     {% if projet.imageName %}
-        <img src="{{ asset('uploads/projets/' ~ projet.imageName) }}" class="img-fluid mb-3" style="max-height:300px;object-fit:cover;">
+        {% set ext = projet.imageName|lower|split('.')|last %}
+        {% set _url = asset('uploads/projets/' ~ projet.imageName) %}
+        <div class="card border-0 shadow-sm overflow-hidden mb-4 tf-reveal tf-glass">
+            <div class="row g-0 align-items-center">
+                <div class="col-md-5">
+                    {% if ext in ['jpg','jpeg','png','gif','webp','svg'] %}
+                        <a href="{{ _url }}" data-tf-image-preview class="d-block">
+                            <img src="{{ _url }}" alt="" class="w-100 h-100 object-fit-cover" style="min-height:220px;max-height:320px;">
+                        </a>
+                    {% else %}
+                        <div class="p-4 text-center bg-body-secondary">
+                            <i class="ti ti-photo-off fs-1 text-secondary"></i>
+                            <p class="small mb-0 mt-2"><a href="{{ _url }}" target="_blank" rel="noopener">Ouvrir le fichier</a></p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-7 p-4 p-lg-5">
+                    <h5 class="mb-3">Couverture projet</h5>
+                    <p class="text-secondary small mb-3">Cliquez sur l’image pour l’aperçu plein écran ou utilisez les actions ci-dessous.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if ext in ['jpg','jpeg','png','gif','webp','svg'] %}
+                            <a href="{{ _url }}" data-tf-image-preview class="btn btn-dark btn-sm"><i class="ti ti-scan me-1"></i> Aperçu</a>
+                        {% endif %}
+                        <a href="{{ _url }}" class="btn btn-white border btn-sm" download target="_blank" rel="noopener" data-turbo="false"><i class="ti ti-download me-1"></i> Télécharger</a>
+                        <a href="{{ _url }}" class="btn btn-white border btn-sm" target="_blank" rel="noopener"><i class="ti ti-external-link me-1"></i> Ouvrir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
-    <p>{{ projet.description }}</p>
-
-    {# Barre de progression #}
-    {% set total = projet.taches|length %}
-    {% set done = projet.taches|filter(t => t.statut == 'terminee')|length %}
-    {% set percent = total > 0 ? (done / total * 100)|round : 0 %}
-
-    <div class="progress mb-3">
-        <div class="progress-bar bg-success" style="width: {{ percent }}%">
-            {{ percent }}%
+    <div class="row g-4 mb-6">
+        <div class="col-lg-4 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass tf-card-hover">
+                <div class="card-body">
+                    <p class="small text-secondary text-uppercase fw-semibold mb-2">Progression</p>
+                    {{ progress_bar(progress) }}
+                    <p class="small text-secondary mt-3 mb-0">Répartition des statuts de tâches sur ce projet.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass">
+                <div class="card-body">
+                    <p class="small text-secondary text-uppercase fw-semibold mb-3">Statistiques</p>
+                    <div class="row g-3">
+                        <div class="col-sm-4">
+                            <div class="p-3 rounded-3 bg-primary-subtle text-primary-emphasis">
+                                <div class="small">À faire</div>
+                                <div class="fs-3 fw-bold">{{ counts.a_faire }}</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-3 rounded-3 bg-warning-subtle text-warning-emphasis">
+                                <div class="small">En cours</div>
+                                <div class="fs-3 fw-bold">{{ counts.en_cours }}</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="p-3 rounded-3 bg-success-subtle text-success-emphasis">
+                                <div class="small">Terminées</div>
+                                <div class="fs-3 fw-bold">{{ counts.terminee }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if overdue %}
+                        <div class="alert alert-danger border-0 mt-4 mb-0 shadow-sm">
+                            <i class="ti ti-alert-triangle me-1"></i> Échéance du projet dépassée.
+                        </div>
+                    {% else %}
+                        <p class="text-secondary small mt-4 mb-0"><i class="ti ti-calendar-event me-1"></i> Jours restants avant la deadline : <strong>{{ remaining }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
-    {# Statistiques du service #}
-    <div class="mb-4">
-        <h5>Statistiques</h5>
-        <p><strong>Progression :</strong></p>
-{{ progress_bar(progress) }}
-        <p><strong>Tâches :</strong></p>
-        <ul>
-            <li>À faire : {{ counts.a_faire }}</li>
-            <li>En cours : {{ counts.en_cours }}</li>
-            <li>Terminées : {{ counts.terminee }}</li>
-        </ul>
-        {% if overdue %}
-            <p class="text-danger fw-bold">⚠️ Projet en retard !</p>
-        {% else %}
-            <p class="text-success">Jours restants : {{ remaining }}</p>
-        {% endif %}
-    </div>
-
-    {# Bouton modifier projet #}
-    {% if app.user == projet.createur or is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('projet_edit', {id: projet.id}) }}" class="btn btn-warning mb-3">
-            ✏️ Modifier le projet
-        </a>
-    {% endif %}
-
-    <h3>Tâches</h3>
-    {% if is_granted('ROLE_USER') %}
-        <a href="{{ path('tache_new', {id: projet.id}) }}" class="btn btn-primary mb-3">
-            ➕ Ajouter une tâche
-        </a>
-    {% endif %}
-
-    <hr>
-
-    {# Derniers projets consultés #}
     {% if recentProjects|length > 0 %}
-    <div class="mb-4">
-        <h4>📋 Derniers projets consultés</h4>
-        <ul class="list-group">
-            {% for rp in recentProjects %}
-                <li class="list-group-item">
-                    <a href="{{ path('projet_show', {id: rp.id}) }}">{{ rp.nom }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+        <div class="card border-0 shadow-sm mb-6 tf-reveal tf-glass">
+            <div class="card-body">
+                <h5 class="mb-3">Récemment consultés</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for rp in recentProjects %}
+                        <a href="{{ path('projet_show', {id: rp.id}) }}" class="badge rounded-pill bg-body-secondary text-body border tf-card-hover text-decoration-none px-3 py-2">{{ rp.nom }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     {% endif %}
 
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Titre</th>
-            <th>Statut</th>
-            <th>Priorité</th>
-            <th>Étiquettes</th>
-            <th>Fichier</th>
-            <th>Actions</th>
-            <th>Date création</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for t in taches %}
-        <tr>
-            <td>{{ t.titre }}</td>
-
-            <td>
-                {% if t.statut == 'a_faire' %}
-                    <span class="badge bg-secondary">À faire</span>
-                {% elseif t.statut == 'en_cours' %}
-                    <span class="badge bg-warning text-dark">En cours</span>
-                {% elseif t.statut == 'terminee' %}
-                    <span class="badge bg-success">Terminée</span>
-                {% endif %}
-            </td>
-
-            <td>
-    {{ t.priorite|priority_icon }}
-</td>
-
-            <td>
-                {% for e in t.etiquettes %}
-                    <span class="badge" style="background-color: {{ e.couleur }}">{{ e.nom }}</span>
-                {% endfor %}
-            </td>
-
-            <td>
-                {% if t.pieceJointeName %}
-                   <a href="{{ asset('uploads/taches/' ~ t.pieceJointeName) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-    📎 Télécharger
-</a>
-{% else %}
-    -
-{% endif %}
-</td>
-
-<td>
-    <a href="{{ path('tache_edit', {id: t.id}) }}" class="btn btn-sm btn-warning">
-        Modifier
-    </a>
-
-    <form method="post"
-          action="{{ path('tache_delete', {id: t.id}) }}"
-          style="display:inline"
-          class="delete-tache-form">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
-        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-    </form>
-</td>
-<td>
-    {{ t.dateCreation|time_ago }}
-</td>
-</tr>
-
-{% else %}
-<tr>
-    <td colspan="6" class="text-center">Aucune tâche pour ce projet.</td>
-</tr>
-{% endfor %}
-
-</tbody>
-</table>
-{# PAGINATION TACHES #}
-<div class="d-flex justify-content-center mt-3">
-    {{ knp_pagination_render(taches) }}
-</div>
-
-</div>
-
+    <div class="card card-lg border-0 shadow-sm tf-reveal tf-glass overflow-hidden">
+        <div class="card-header bg-transparent border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="mb-0">Tâches</h5>
+                <p class="text-secondary small mb-0">Pièces jointes : aperçu, ouverture et téléchargement.</p>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 tf-table">
+                    <thead class="bg-body-secondary bg-opacity-50">
+                        <tr>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Priorité</th>
+                            <th>Étiquettes</th>
+                            <th>Fichier</th>
+                            <th class="text-end">Actions</th>
+                            <th>Créé</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for t in taches %}
+                        <tr>
+                            <td class="fw-semibold">{{ t.titre }}</td>
+                            <td>
+                                {% if t.statut == 'a_faire' %}
+                                    <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">À faire</span>
+                                {% elseif t.statut == 'en_cours' %}
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">En cours</span>
+                                {% elseif t.statut == 'terminee' %}
+                                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Terminée</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ t.priorite|priority_icon }}</td>
+                            <td>
+                                {% for e in t.etiquettes %}
+                                    <span class="badge rounded-pill me-1 border-0" style="background-color: {{ e.couleur }}; color: #fff;">{{ e.nom }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if t.pieceJointeName %}
+                                    {% set u = asset('uploads/taches/' ~ t.pieceJointeName) %}
+                                    {% set ext = t.pieceJointeName|lower|split('.')|last %}
+                                    <div class="btn-group btn-group-sm">
+                                        {% if ext in ['jpg','jpeg','png','gif','webp','svg'] %}
+                                            <a href="{{ u }}" data-tf-image-preview class="btn btn-white border"><i class="ti ti-scan"></i></a>
+                                        {% endif %}
+                                        <a href="{{ u }}" class="btn btn-white border" target="_blank" rel="noopener"><i class="ti ti-external-link"></i></a>
+                                        <a href="{{ u }}" class="btn btn-dark" download target="_blank" rel="noopener" data-turbo="false"><i class="ti ti-download"></i></a>
+                                    </div>
+                                {% else %}
+                                    <span class="text-secondary">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ path('tache_edit', {id: t.id}) }}" class="btn btn-sm btn-white border"><i class="ti ti-edit"></i></a>
+                                    <form method="post" action="{{ path('tache_delete', {id: t.id}) }}" class="d-inline delete-tache-form">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="ti ti-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="text-secondary small">{{ t.dateCreation|time_ago }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-6 text-secondary">Aucune tâche pour ce projet.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent border-top border-dashed">
+            <div class="d-flex justify-content-center">{{ knp_pagination_render(taches) }}</div>
+        </div>
+    </div>
 {% endblock %}

@@ -21,17 +21,17 @@ class ProjetApiTest extends ApiTestCase
     $client = static::createClient();
 
     $client->request('POST', '/api/projets', [
-    'headers' => [
-        'Content-Type' => 'application/ld+json',
-        'Accept' => 'application/ld+json',
-    ],
-    'json' => [
-        'nom' => 'Projet Test',
-        'description' => 'Description test',
-        'statut' => 'en_cours',
-        'dateLimite' => (new \DateTime('2026-12-31'))->format('Y-m-d'),
-    ],
-]);
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/ld+json',
+        ],
+        'json' => [
+            'nom' => 'Projet Test',
+            'description' => 'Description test',
+            'statut' => 'en_cours',
+            'dateLimite' => '2026-12-31'
+        ],
+    ]);
 
     $this->assertResponseStatusCodeSame(201);
 }
@@ -42,7 +42,7 @@ public function testPostProjetInvalid(): void
 
     $client->request('POST', '/api/projets', [
         'headers' => [
-            'Content-Type' => 'application/ld+json',
+            'Content-Type' => 'application/json',
             'Accept' => 'application/ld+json',
         ],
         'json' => [

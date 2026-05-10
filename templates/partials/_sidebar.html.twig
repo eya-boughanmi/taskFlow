@@ -1,0 +1,99 @@
+{% set route = app.request.attributes.get('_route') %}
+
+<div id="miniSidebar" data-simplebar>
+  <div class="brand-logo">
+    <a class="d-none d-md-flex align-items-center gap-2 text-decoration-none" href="{{ path('app_dashboard') }}">
+      <img src="{{ asset('dasher/assets/images/brand/logo/logo-icon.svg') }}" alt="TaskFlow"/>
+      <span class="fw-bold fs-4 site-logo-text">TaskFlow</span>
+    </a>
+  </div>
+  <ul class="navbar-nav flex-column mt-2">
+    <li class="nav-item">
+      <a class="nav-link {{ route in ['app_dashboard', 'app_home'] ? 'active' : '' }}" href="{{ path('app_dashboard') }}">
+        <span class="nav-icon"><i class="ti ti-layout-dashboard fs-5"></i></span>
+        <span class="text">Tableau de bord</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {{ route == 'projet_index' or route == 'projet_show' or route == 'projet_new' or route == 'projet_edit' ? 'active' : '' }}" href="{{ path('projet_index') }}">
+        <span class="nav-icon">
+          <i class="ti ti-layout-kanban fs-5"></i>
+        </span>
+        <span class="text">Projets</span>
+      </a>
+    </li>
+    {% if is_granted('ROLE_ADMIN') %}
+      <li class="nav-item">
+        <a class="nav-link {{ route starts with 'etiquette_' ? 'active' : '' }}" href="{{ path('etiquette_index') }}">
+          <span class="nav-icon"><i class="ti ti-tags fs-5"></i></span>
+          <span class="text">Étiquettes</span>
+        </a>
+      </li>
+    {% endif %}
+    <li class="nav-item mt-4">
+      <div class="nav-heading">Compte</div>
+      <hr class="mx-5 nav-line mb-1"/>
+    </li>
+    {% if app.user %}
+      <li class="nav-item">
+        <a class="nav-link text-danger" href="{{ path('app_logout') }}">
+          <span class="nav-icon"><i class="ti ti-logout fs-5"></i></span>
+          <span class="text">Déconnexion</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_register') }}">
+          <span class="nav-icon"><i class="ti ti-user-plus fs-5"></i></span>
+          <span class="text">Inscription</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_login') }}">
+          <span class="nav-icon"><i class="ti ti-login fs-5"></i></span>
+          <span class="text">Connexion</span>
+        </a>
+      </li>
+    {% endif %}
+    <li class="nav-item pb-5">
+      <div class="text-center py-5 upgrade-ui">
+        <img src="{{ asset('dasher/assets/images/avatar/avatar-fallback.jpg') }}" alt="" class="avatar avatar-md rounded-circle">
+        <div class="my-3">
+          <h5 class="mb-1 fs-6">{{ app.user ? app.user.pseudo : 'Invité' }}</h5>
+          <span class="text-secondary small">{{ app.user ? app.user.email : 'Mode navigation' }}</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="offcanvasNav offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+    <a class="d-flex align-items-center gap-2 text-decoration-none" href="{{ path('app_dashboard') }}">
+      <img src="{{ asset('dasher/assets/images/brand/logo/logo-icon.svg') }}" alt=""/>
+      <span class="fw-bold fs-4 site-logo-text">TaskFlow</span>
+    </a>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <ul class="navbar-nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_dashboard') }}"><span class="nav-icon"><i class="ti ti-layout-dashboard"></i></span><span class="text">Tableau de bord</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ path('projet_index') }}"><span class="nav-icon"><i class="ti ti-layout-kanban"></i></span><span class="text">Projets</span></a>
+      </li>
+      {% if is_granted('ROLE_ADMIN') %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path('etiquette_index') }}"><span class="nav-icon"><i class="ti ti-tags"></i></span><span class="text">Étiquettes</span></a>
+        </li>
+      {% endif %}
+      {% if app.user %}
+        <li class="nav-item"><a class="nav-link text-danger" href="{{ path('app_logout') }}"><span class="nav-icon"><i class="ti ti-logout"></i></span><span class="text">Déconnexion</span></a></li>
+      {% else %}
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}"><span class="nav-icon"><i class="ti ti-login"></i></span><span class="text">Connexion</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_register') }}"><span class="nav-icon"><i class="ti ti-user-plus"></i></span><span class="text">Inscription</span></a></li>
+      {% endif %}
+    </ul>
+  </div>
+</div>

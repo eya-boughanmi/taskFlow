@@ -1,34 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Étiquettes{% endblock %}
+{% block title %}Étiquettes · TaskFlow{% endblock %}
+
+{% block page_header %}
+    <div class="row align-items-center mb-6 tf-reveal">
+        <div class="col">
+            <p class="text-secondary small text-uppercase fw-semibold mb-1">Référentiel</p>
+            <h1 class="h2 mb-0">Étiquettes</h1>
+        </div>
+        <div class="col-auto">
+            <a href="{{ path('etiquette_new') }}" class="btn btn-gradient-primary btn-lg shadow-sm"><i class="ti ti-plus me-1"></i> Nouvelle étiquette</a>
+        </div>
+    </div>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Liste des étiquettes</h1>
-    <a href="{{ path('etiquette_new') }}" class="btn btn-primary mb-3">Ajouter</a>
-
-    <table class="table">
-        <tr>
-            <th>Nom</th>
-            <th>Couleur</th>
-            <th>Actions</th>
-        </tr>
-        {% for e in etiquettes %}
-        <tr>
-            <td>{{ e.nom }}</td>
-            <td>
-                <span class="badge" style="background-color: {{ e.couleur }}">{{ e.couleur }}</span>
-            </td>
-            <td>
-                <form method="post" action="{{ path('etiquette_delete', {id: e.id}) }}" onsubmit="return confirm('Supprimer ?')">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ e.id) }}">
-                    <button class="btn btn-danger btn-sm delete-btn">Supprimer</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="3">Aucune étiquette.</td></tr>
-        {% endfor %}
-    </table>
-</div>
+    <div class="card card-lg border-0 shadow-sm tf-glass tf-reveal overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 tf-table">
+                <thead class="bg-body-secondary bg-opacity-50">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Couleur</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for e in etiquettes %}
+                    <tr>
+                        <td class="fw-semibold">{{ e.nom }}</td>
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2 border-0" style="background-color: {{ e.couleur }}; color: #fff;">{{ e.couleur }}</span>
+                        </td>
+                        <td class="text-end">
+                            <form method="post" action="{{ path('etiquette_delete', {id: e.id}) }}" class="d-inline delete-etiquette-form">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ e.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="ti ti-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3" class="text-center py-6 text-secondary">Aucune étiquette.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

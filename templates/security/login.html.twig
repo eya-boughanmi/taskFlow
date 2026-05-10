@@ -1,34 +1,105 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/login.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion · TaskFlow{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<section class="tf-login-shell min-vh-100">
+    <div class="row g-0 min-vh-100 flex-column flex-lg-row align-items-stretch">
+        {# Colonne gauche : illustration + message (visible aussi sur mobile, version compacte) #}
+        <div class="col-lg-6 tf-login-hero-col position-relative overflow-hidden">
+            <div class="tf-login-hero-bg position-absolute top-0 start-0 w-100 h-100"></div>
+            <div class="position-relative z-1 d-flex flex-column justify-content-between p-4 p-lg-6 p-xl-8 text-white h-100 tf-login-hero-inner">
+                <div>
+                    <a href="{{ path('app_dashboard') }}" class="d-inline-flex align-items-center gap-2 text-white text-decoration-none mb-3 mb-lg-5 tf-login-fade" data-turbo="false">
+                        <img src="{{ asset('dasher/assets/images/brand/logo/logo-icon.svg') }}" alt="" width="44" height="44" class="rounded-3 shadow"/>
+                        <span class="fw-bold fs-3">TaskFlow</span>
+                    </a>
+                    <h2 class="h1 fw-bold mb-2 mb-lg-3 tf-login-fade tf-login-fade-delay-1">Pilotez vos projets.</h2>
+                    <p class="text-white-50 mb-0 mb-lg-4 tf-login-fade tf-login-fade-delay-2 tf-login-lead">
+                        Tableaux de bord, priorités et livrables — une interface pensée comme une application SaaS.
+                    </p>
+                </div>
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+                <div class="tf-login-illus-wrap tf-login-fade tf-login-fade-delay-3 my-3 my-lg-0">
+                    {% include 'partials/_illustration_saas_tasks.svg.twig' %}
+                </div>
+
+                <p class="small text-white-50 mb-0 tf-login-fade tf-login-fade-delay-4 d-none d-lg-block">© {{ 'now'|date('Y') }} TaskFlow</p>
+            </div>
         </div>
-    {% endif %}
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+        {# Colonne droite : formulaire #}
+        <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 p-xl-6 bg-body tf-login-form-col">
+            <div class="w-100 tf-login-form-max">
+                <div class="text-center text-lg-start mb-4 d-lg-none">
+                    <p class="small text-secondary mb-0">© {{ 'now'|date('Y') }} TaskFlow</p>
+                </div>
 
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
+                {% include 'partials/_flash.html.twig' %}
+
+                <div class="text-center text-lg-start mb-4">
+                    <h1 class="h2 fw-bold mb-2">Connexion</h1>
+                    <p class="text-secondary mb-0">
+                        Pas encore de compte ?
+                        <a href="{{ path('app_register') }}" class="fw-semibold text-decoration-none" data-turbo="false">S’inscrire</a>
+                    </p>
+                </div>
+
+                <div class="card border-0 shadow-lg tf-glass tf-login-card tf-login-rise">
+                    <div class="card-body p-4 p-md-5">
+                        {% if error %}
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                        {% endif %}
+
+                        {% if app.user %}
+                            <div class="alert alert-info border-0 mb-4">
+                                Connecté en tant que {{ app.user.userIdentifier }} —
+                                <a href="{{ logout_path() }}" class="fw-semibold" data-turbo="false">Se déconnecter</a>
+                            </div>
+                        {% endif %}
+
+                        <form method="post" class="needs-validation" novalidate data-turbo="false">
+                            <div class="mb-3">
+                                <label for="inputEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control form-control-lg" autocomplete="email" required autofocus>
+                                <div class="invalid-feedback">Adresse email invalide.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inputPassword" class="form-label">Mot de passe</label>
+                                <div class="password-field position-relative">
+                                    <input type="password" name="password" id="inputPassword" class="form-control form-control-lg fakePassword" autocomplete="current-password" required>
+                                    <span class="position-absolute top-50 end-0 translate-middle-y pe-3" style="cursor:pointer;"><i class="ti ti-eye-off passwordToggler"></i></span>
+                                    <div class="invalid-feedback">Mot de passe requis.</div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                            <div class="mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="_remember_me" id="rememberMeCheckbox">
+                                    <label class="form-check-label" for="rememberMeCheckbox">Se souvenir de moi</label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-gradient-primary btn-lg text-white" type="submit">
+                                    <i class="ti ti-login me-1"></i> Se connecter
+                                </button>
+                                <a href="{{ path('app_dashboard') }}" class="btn btn-white border btn-lg" data-turbo="false">Tableau de bord</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <p class="text-center text-secondary small mt-4 mb-0">
+                    <a href="{{ path('projet_index') }}" class="text-decoration-none" data-turbo="false">Voir les projets (invité)</a>
+                </p>
+            </div>
+        </div>
     </div>
+</section>
+{% endblock %}
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
+{% block javascripts %}
+<script src="{{ asset('dasher/assets/js/vendors/password.js') }}"></script>
 {% endblock %}

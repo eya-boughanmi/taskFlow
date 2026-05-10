@@ -1,19 +1,44 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/auth.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription · TaskFlow{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+    <div class="row justify-content-center">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <div class="text-center mb-6 tf-reveal">
+                <a href="{{ path('app_dashboard') }}" class="fs-2 fw-bold d-flex align-items-center gap-2 justify-content-center mb-4 text-decoration-none text-body">
+                    <img src="{{ asset('dasher/assets/images/brand/logo/logo-icon.svg') }}" alt="" width="40" height="40"/>
+                    <span>TaskFlow</span>
+                </a>
+                <h1 class="mb-2 h2">Créer un compte</h1>
+                <p class="mb-0 text-secondary">
+                    Déjà inscrit ?
+                    <a href="{{ path('app_login') }}" class="fw-semibold">Se connecter</a>
+                </p>
+            </div>
 
-    {{ form_errors(registrationForm) }}
+            <div class="card card-lg border-0 shadow-lg tf-glass tf-reveal">
+                <div class="card-body p-6">
+                    {{ form_errors(registrationForm) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+                    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        {{ form_row(registrationForm.pseudo, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                        {{ form_row(registrationForm.email, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                        {{ form_row(registrationForm.plainPassword, {
+                            label: 'Mot de passe',
+                            attr: { class: 'form-control form-control-lg' }
+                        }) }}
+                        {{ form_row(registrationForm.agreeTerms) }}
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-gradient-primary btn-lg text-white">
+                                <i class="ti ti-user-plus me-1"></i> S’inscrire
+                            </button>
+                            <a href="{{ path('app_login') }}" class="btn btn-white border btn-lg">Retour connexion</a>
+                        </div>
+                    {{ form_end(registrationForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

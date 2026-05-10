@@ -1,0 +1,90 @@
+<div class="navbar-glass navbar navbar-expand-lg px-0 px-lg-4">
+  <div class="container-fluid px-lg-0">
+    <div class="d-flex align-items-center gap-4">
+      <div class="d-block d-lg-none">
+        <a class="text-inherit" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+          <i class="ti ti-menu-2 fs-4"></i>
+        </a>
+      </div>
+      <div class="d-none d-lg-block">
+        <a class="sidebar-toggle d-flex texttooltip p-3" href="javascript:void(0)" data-template="collapseMessage">
+          <span class="collapse-mini">
+            <i class="ti ti-arrow-bar-left text-secondary fs-5"></i>
+          </span>
+          <span class="collapse-expanded">
+            <i class="ti ti-arrow-bar-right text-secondary fs-5"></i>
+            <div id="collapseMessage" class="d-none"><span class="small">Réduire</span></div>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <ul class="list-unstyled d-flex align-items-center mb-0 gap-2 ms-auto">
+      <li>
+        <div class="dropdown">
+          <button class="btn btn-ghost btn-icon rounded-circle d-flex align-items-center" type="button"
+                  aria-expanded="false" data-bs-toggle="dropdown" aria-label="Changer le thème">
+            <i class="ti theme-icon-active lh-1 fs-5"><i class="ti ti-sun theme-icon"></i></i>
+            <span class="visually-hidden bs-theme-text">Thème</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow">
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="light" aria-pressed="true">
+                <i class="ti ti-sun theme-icon"></i><span class="ms-2">Clair</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                <i class="ti ti-moon theme-icon"></i><span class="ms-2">Sombre</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                <i class="ti ti-circle-half-2 theme-icon"></i><span class="ms-2">Auto</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="ms-1 dropdown">
+        <a href="#" class="d-inline-block" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="{{ asset('dasher/assets/images/avatar/avatar-1.jpg') }}" alt="" class="avatar avatar-sm rounded-circle border border-2 border-primary-subtle"/>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-0 shadow-lg tf-glass">
+          <div class="d-flex gap-3 align-items-center border-dashed border-bottom px-4 py-4">
+            <img src="{{ asset('dasher/assets/images/avatar/avatar-1.jpg') }}" alt="" class="avatar avatar-md rounded-circle"/>
+            <div>
+              <h4 class="mb-0 fs-5">{{ app.user ? app.user.pseudo : 'Invité' }}</h4>
+              <p class="mb-0 text-secondary small">{{ app.user ? app.user.email : 'Non connecté' }}</p>
+            </div>
+          </div>
+          <div class="p-3 d-flex flex-column gap-1">
+            <a href="{{ path('app_dashboard') }}" class="dropdown-item d-flex align-items-center gap-2 rounded-3">
+              <i class="ti ti-layout-dashboard"></i><span>Tableau de bord</span>
+            </a>
+            <a href="{{ path('projet_index') }}" class="dropdown-item d-flex align-items-center gap-2 rounded-3">
+              <i class="ti ti-layout-kanban"></i><span>Projets</span>
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+              <a href="{{ path('etiquette_index') }}" class="dropdown-item d-flex align-items-center gap-2 rounded-3">
+                <i class="ti ti-tags"></i><span>Étiquettes</span>
+              </a>
+            {% endif %}
+          </div>
+          <div class="border-dashed border-top mb-2 pt-3 px-4 pb-3">
+            {% if app.user %}
+              <a href="{{ path('app_logout') }}" class="text-danger d-flex align-items-center gap-2 text-decoration-none fw-medium">
+                <i class="ti ti-logout"></i><span>Déconnexion</span>
+              </a>
+            {% else %}
+              <a href="{{ path('app_login') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+                <i class="ti ti-login"></i><span>Connexion</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

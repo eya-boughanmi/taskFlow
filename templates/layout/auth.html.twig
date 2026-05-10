@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" data-turbo="false">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="icon" href="{{ asset('dasher/assets/images/favicon/favicon.ico') }}" sizes="any">
+    <script src="{{ asset('dasher/assets/js/vendors/color-modes.js') }}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+    <link rel="stylesheet" href="{{ asset('dasher/assets/css/theme.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('dasher/taskflow-brand.css') }}"/>
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="tf-page-gradient">
+<main class="d-flex flex-column min-vh-100 justify-content-center position-relative">
+    <section class="py-8">
+        <div class="container">
+            {% include 'partials/_flash.html.twig' %}
+            {% block body %}{% endblock %}
+        </div>
+    </section>
+
+    <div class="position-fixed end-0 bottom-0 m-4 z-3">
+        <div class="dropdown">
+            <button class="btn btn-light btn-icon rounded-circle shadow-sm d-flex align-items-center" type="button"
+                    aria-expanded="false" data-bs-toggle="dropdown" aria-label="Thème">
+                <i class="ti theme-icon-active lh-1"><i class="ti ti-sun theme-icon"></i></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="light">
+                        <i class="ti ti-sun theme-icon"></i><span class="ms-2">Clair</span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+                        <i class="ti ti-moon theme-icon"></i><span class="ms-2">Sombre</span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto">
+                        <i class="ti ti-circle-half-2 theme-icon"></i><span class="ms-2">Auto</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('dasher/taskflow-motion.js') }}"></script>
+{{ importmap('app') }}
+{% block javascripts %}{% endblock %}
+</body>
+</html>

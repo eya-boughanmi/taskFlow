@@ -1,0 +1,187 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord · TaskFlow{% endblock %}
+
+{% block page_header %}
+    <div class="row align-items-end mb-6 tf-reveal">
+        <div class="col-lg-8">
+            <p class="text-secondary small text-uppercase fw-semibold mb-1">Vue globale</p>
+            <h1 class="h2 mb-0">Tableau de bord</h1>
+            <p class="text-secondary mb-0">Indicateurs clés et charge de travail sur l’ensemble de la plateforme.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a href="{{ path('projet_index') }}" class="btn btn-white border shadow-sm me-2">
+                <i class="ti ti-layout-kanban me-1"></i> Projets
+            </a>
+            {% if is_granted('ROLE_CHEF_PROJET') %}
+                <a href="{{ path('projet_new') }}" class="btn btn-gradient-primary shadow-sm">
+                    <i class="ti ti-plus me-1"></i> Nouveau projet
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row g-4 mb-2">
+        {% if stats.users_total is not null %}
+            <div class="col-sm-6 col-xl-3 tf-reveal">
+                <div class="card card-lg border-0 shadow-sm h-100 tf-glass tf-card-hover">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="icon-shape icon-lg rounded-circle bg-primary-subtle text-primary-emphasis">
+                                <i class="ti ti-users fs-4"></i>
+                            </span>
+                            <span class="badge bg-body-secondary text-secondary">Admin</span>
+                        </div>
+                        <p class="text-secondary small mb-1">Utilisateurs</p>
+                        <h3 class="mb-0 fw-bold">{{ stats.users_total }}</h3>
+                        <p class="text-secondary small mb-0 mt-2">Comptes enregistrés</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="col-sm-6 col-xl-3 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass tf-card-hover">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="icon-shape icon-lg rounded-circle bg-warning-subtle text-warning-emphasis">
+                            <i class="ti ti-folders fs-4"></i>
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-1">Projets</p>
+                    <h3 class="mb-0 fw-bold">{{ stats.projets_total }}</h3>
+                    <p class="text-secondary small mb-0 mt-2">Tous statuts confondus</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass tf-card-hover">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="icon-shape icon-lg rounded-circle bg-success-subtle text-success-emphasis">
+                            <i class="ti ti-checkbox fs-4"></i>
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-1">Tâches</p>
+                    <h3 class="mb-0 fw-bold">{{ stats.taches_total }}</h3>
+                    <p class="text-secondary small mb-0 mt-2">Sur l’ensemble des projets</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass tf-card-hover">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="icon-shape icon-lg rounded-circle bg-info-subtle text-info-emphasis">
+                            <i class="ti ti-chart-pie fs-4"></i>
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-1">Tâches terminées</p>
+                    <h3 class="mb-0 fw-bold">{{ stats.taches_par_statut.terminee|default(0) }}</h3>
+                    <p class="text-secondary small mb-0 mt-2">
+                        {{ stats.taches_total > 0 ? ((stats.taches_par_statut.terminee|default(0) / stats.taches_total) * 100)|round }}&nbsp;% du total
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-6">
+        <div class="col-lg-6 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="mb-1">Tâches par statut</h5>
+                    <p class="text-secondary small mb-0">Répartition opérationnelle</p>
+                </div>
+                <div class="card-body">
+                    {% set tf = stats.taches_total %}
+                    {% for row in [
+                        {label: 'À faire', key: 'a_faire', color: 'secondary'},
+                        {label: 'En cours', key: 'en_cours', color: 'warning'},
+                        {label: 'Terminées', key: 'terminee', color: 'success'}
+                    ] %}
+                        {% set cnt = stats.taches_par_statut[row.key]|default(0) %}
+                        {% set pct = tf > 0 ? (cnt / tf * 100)|round : 0 %}
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>{{ row.label }}</span>
+                                <span class="fw-semibold">{{ cnt }}</span>
+                            </div>
+                            <div class="progress rounded-pill" style="height:8px;">
+                                <div class="progress-bar bg-{{ row.color }}" style="width: {{ pct }}%;"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 tf-reveal">
+            <div class="card card-lg border-0 shadow-sm h-100 tf-glass">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="mb-1">Projets par statut</h5>
+                    <p class="text-secondary small mb-0">Pipeline</p>
+                </div>
+                <div class="card-body">
+                    {% set pf = stats.projets_total %}
+                    {% for row in [
+                        {label: 'Planifiés', key: 'planifie', color: 'primary'},
+                        {label: 'En cours', key: 'en_cours', color: 'warning'},
+                        {label: 'Terminés', key: 'termine', color: 'success'},
+                        {label: 'Annulés', key: 'annule', color: 'danger'}
+                    ] %}
+                        {% set cnt = stats.projets_par_statut[row.key]|default(0) %}
+                        {% set pct = pf > 0 ? (cnt / pf * 100)|round : 0 %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>{{ row.label }}</span>
+                                <span class="fw-semibold">{{ cnt }}</span>
+                            </div>
+                            <div class="progress rounded-pill" style="height:8px;">
+                                <div class="progress-bar bg-{{ row.color }}" style="width: {{ pct }}%;"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-lg border-0 shadow-sm tf-glass tf-reveal overflow-hidden">
+        <div class="card-header bg-transparent border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="mb-0">Projets les plus chargés</h5>
+                <p class="text-secondary small mb-0">Nombre de tâches par projet (top 5)</p>
+            </div>
+            <a href="{{ path('projet_index') }}" class="btn btn-sm btn-white border">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 tf-table">
+                <thead class="bg-body-secondary bg-opacity-50">
+                    <tr>
+                        <th>Projet</th>
+                        <th class="text-end">Tâches</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in stats.top_projets_taches %}
+                    <tr>
+                        <td class="fw-semibold">{{ row.nom }}</td>
+                        <td class="text-end"><span class="badge bg-body-secondary text-body">{{ row.taches }}</span></td>
+                        <td class="text-end">
+                            <a href="{{ path('projet_show', {id: row.id}) }}" class="btn btn-sm btn-white border">Ouvrir</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3" class="text-center py-5 text-secondary">Aucun projet pour l’instant.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
